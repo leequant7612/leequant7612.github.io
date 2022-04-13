@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leequant7612.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta property="og:type" content="article">
+<meta property="og:title" content="04 MapReduceOnYARN">
+<meta property="og:url" content="http://leequant7612.github.io/2022/04/13/04-MapReduceOnYARN/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/04-MapReduceOnYARN/image-20220408142133261.png">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/04-MapReduceOnYARN/YARN_MAPREDUCE.png">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/04-MapReduceOnYARN/SHUFFLING.png">
+<meta property="article:published_time" content="2022-04-13T02:51:03.000Z">
+<meta property="article:modified_time" content="2022-04-13T02:53:16.105Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="YARN">
+<meta property="article:tag" content="MapReduce">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://leequant7612.github.io/2022/04/13/04-MapReduceOnYARN/image-20220408142133261.png">
+
+<link rel="canonical" href="http://leequant7612.github.io/2022/04/13/04-MapReduceOnYARN/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>04 MapReduceOnYARN | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://leequant7612.github.io/2022/04/13/04-MapReduceOnYARN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          04 MapReduceOnYARN
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-13 11:51:03 / Modified: 11:53:16" itemprop="dateCreated datePublished" datetime="2022-04-13T11:51:03+09:00">2022-04-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop-ecosystem/" itemprop="url" rel="index"><span itemprop="name">Hadoop ecosystem</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop-ecosystem/MapReduce/" itemprop="url" rel="index"><span itemprop="name">MapReduce</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <img src="/2022/04/13/04-MapReduceOnYARN/image-20220408142133261.png" class="">
+
+<span id="more"></span>
+
+<h1 id="1-일단-실행해보기-위한-최소한의-설명"><a href="#1-일단-실행해보기-위한-최소한의-설명" class="headerlink" title="1. 일단 실행해보기 위한 최소한의 설명"></a>1. 일단 실행해보기 위한 최소한의 설명</h1><h2 id="1-1-MapReduce프레임워크-내부에서-사용되는-데이터-타입"><a href="#1-1-MapReduce프레임워크-내부에서-사용되는-데이터-타입" class="headerlink" title="1.1 MapReduce프레임워크 내부에서 사용되는 데이터 타입"></a>1.1 MapReduce프레임워크 내부에서 사용되는 데이터 타입</h2><p>자료형은 분산 환경에서 처리되므로 하둡에서 정의한 인터페이스(<code>Writable</code>)를 상속하는 특별한 클래스타입을 사용해야한다.</p>
+<ul>
+<li><code>int</code> - <code>IntWritable</code></li>
+<li><code>long</code> - <code>LongWritable</code></li>
+<li><code>String</code> - <code>Text</code></li>
+</ul>
+<h2 id="1-2-기본-패턴"><a href="#1-2-기본-패턴" class="headerlink" title="1.2 기본 패턴"></a>1.2 기본 패턴</h2><h3 id="1-2-1-Mapper"><a href="#1-2-1-Mapper" class="headerlink" title="1.2.1 Mapper"></a>1.2.1 Mapper</h3><ul>
+<li><p>Mapper 상속  <code>Mapper&lt;K1, V1, K2, V2&gt;</code></p>
+</li>
+<li><p>map 메소드 오버라이딩</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">map</span><span class="params">(K1, V1, Context)</span>&#123;</span><br><span class="line">	<span class="comment">// Context객체 : HDFS와 통신을 담당하는 객체 (레코드 받음, 로그출력, 맵아웃풋 넘김)</span></span><br><span class="line">	@@@@@@@@@@@@@@@@@@@@@@@@@@@@패턴정리하기@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>예시코드</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WordCountMapper</span> <span class="keyword">extends</span> <span class="title class_">Mapper</span>&lt;LongWritable, Text, Text, IntWritable&gt; &#123;</span><br><span class="line">	<span class="comment">// map메소드의 실행 결과 중 map의 output value를 저장할 변수</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="type">IntWritable</span> <span class="variable">one</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">IntWritable</span>(<span class="number">1</span>);</span><br><span class="line">	<span class="keyword">private</span> <span class="type">Text</span> <span class="variable">outputKey</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Text</span>(); <span class="comment">// map메소드 실행 결과 중 key를 저장할 변수</span></span><br><span class="line">	</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">map</span><span class="params">(LongWritable key, Text value,</span></span><br><span class="line"><span class="params">				Mapper&lt;LongWritable, Text, Text, IntWritable&gt;.Context context)</span></span><br><span class="line">			<span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">        <span class="comment">// value에 한 라인에 해당하는 문장이 전달된다. ex) read a book</span></span><br><span class="line">        <span class="type">StringTokenizer</span> <span class="variable">st</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringTokenizer</span>(value.toString());</span><br><span class="line">        <span class="keyword">while</span>(st.hasMoreElements()) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">token</span> <span class="operator">=</span> st.nextToken();</span><br><span class="line">            outputKey.set(token); <span class="comment">// 분리한 단어를 ouputKey라는 Text타입의 변수에 세팅</span></span><br><span class="line">            <span class="comment">// Context객체에 값을 셋팅</span></span><br><span class="line">            context.write(outputKey, one);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-2-Reducer"><a href="#1-2-2-Reducer" class="headerlink" title="1.2.2 Reducer"></a>1.2.2 Reducer</h3><ul>
+<li><p>Reducer를 상속 <code>Reducer&lt;K2, V2, K3, V3&gt;</code></p>
+</li>
+<li><p>reduce 메소드 오버라이딩</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">proteted <span class="keyword">void</span> <span class="title function_">reduce</span><span class="params">(K2, Iterable&lt;V2&gt;, Context)</span>&#123;</span><br><span class="line">	<span class="comment">// Context객체 : HDFS와 통신을 담당하는 객체 (맵아웃풋 받음, 로그출력, 리듀스아웃풋 넘김)</span></span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>예시코드</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WordCountReducer</span> </span><br><span class="line">    			<span class="keyword">extends</span> <span class="title class_">Reducer</span>&lt;Text, IntWritable, Text, IntWritable&gt; &#123;</span><br><span class="line">    <span class="comment">// 결과값을 저장할 변수</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">IntWritable</span> <span class="variable">resultVal</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">IntWritable</span>();</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">reduce</span><span class="params">(Text key, Iterable&lt;IntWritable&gt; values,</span></span><br><span class="line"><span class="params">				Reducer&lt;Text, IntWritable, Text, IntWritable&gt;.Context context)</span></span><br><span class="line">			<span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">sum</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (IntWritable value : values) &#123;</span><br><span class="line">            sum = sum + value.get();</span><br><span class="line">        &#125;</span><br><span class="line">        resultVal.set(sum);</span><br><span class="line">        context.write(key, resultVal);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-3-Driver"><a href="#1-2-3-Driver" class="headerlink" title="1.2.3 Driver"></a>1.2.3 Driver</h3><ul>
+<li>맵리듀스를 실행하기 위한 job을 생성</li>
+<li>job을 처리할 실제 클래스에 대한 정보를 정의(Mapper, Reducer, Driver)</li>
+<li>input데이터와 output데이터의 포맷을 정의</li>
+<li>매퍼의 입력데이터에 대한 key와 value의 타입 명시 (디폴트 &#x3D; LongWritable, Text)</li>
+<li>리듀서의 출력데이터에 대한 key와 value의 타입을 명시</li>
+<li>hdfs에 저장된 파일을 읽어오고 처리결과를 저장할 수 있도록 path정보를 설정</li>
+</ul>
+<p>예시코드</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WordCountDriver</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">//1. 맵리듀스를 실행하기 위한 job을 생성</span></span><br><span class="line">        <span class="type">Configuration</span> <span class="variable">conf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Configuration</span>();</span><br><span class="line">        <span class="type">Job</span> <span class="variable">job</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Job</span>(conf, <span class="string">&quot;mywordcount&quot;</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//2. job을 처리할 실제 클래스에 대한 정보를 정의(Mapper, Reducer, Driver)</span></span><br><span class="line">        job.setMapperClass(WordCountMapper.class);</span><br><span class="line">        job.setReducerClass(WordCountReducer.class);</span><br><span class="line">        job.setJarByClass(WordCountDriver.class);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//3. input데이터와 output데이터의 포맷을 정의</span></span><br><span class="line">        job.setInputFormatClass(TextInputFormat.class);</span><br><span class="line">        job.setOutputFormatClass(TextOutputFormat.class);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//4. 리듀서의 출력데이터에 대한 key와 value의 타입을 명시</span></span><br><span class="line">        job.setOutputKeyClass(Text.class);</span><br><span class="line">        job.setOutputValueClass(IntWritable.class);</span><br><span class="line">        <span class="comment">//5. hdfs에 저장된 파일을 읽어오고 처리결과를 저장할 수 있도록 path정보를 설정</span></span><br><span class="line">        FileInputFormat.addInputPath(job, <span class="keyword">new</span> <span class="title class_">Path</span>(args[<span class="number">0</span>]));</span><br><span class="line">        FileOutputFormat.setOutputPath(job, <span class="keyword">new</span> <span class="title class_">Path</span>(args[<span class="number">1</span>]));</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//6. 1번 부터 5번 까지 설정한 내용을 기반으로 실제 job이 실행될 수 있도록 명령</span></span><br><span class="line">        <span class="comment">// 1초마다 잡의 진행상황을 조사하며, 변경내역이 있으면 콘솔로 출력한다</span></span><br><span class="line">        job.waitForCompletion(<span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-맵리듀스-프로그래밍"><a href="#2-맵리듀스-프로그래밍" class="headerlink" title="2. 맵리듀스 프로그래밍"></a>2. 맵리듀스 프로그래밍</h1><h2 id="2-1-맵리듀스-프로그래밍-절차"><a href="#2-1-맵리듀스-프로그래밍-절차" class="headerlink" title="2.1 맵리듀스 프로그래밍 절차"></a>2.1 맵리듀스 프로그래밍 절차</h2><ol>
+<li>맵 리듀스 함수 구현 &#x2F; 유닛테스트</li>
+<li>잡을 실행하는 드라이버 프로그램 작성</li>
+<li>데이터셋 일부를 이용해 로컬모드에서 IDE로 드라이버 실행</li>
+<li>클러스터에서 전체 데이터로 드라이버 실행</li>
+</ol>
+<h2 id="2-2-mrunit으로-유닛테스트"><a href="#2-2-mrunit으로-유닛테스트" class="headerlink" title="2.2 mrunit으로 유닛테스트"></a>2.2 <code>mrunit</code>으로 유닛테스트</h2><p><code>hadoop.mrunit.mapreduce.MapDriver</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MaxTemperatureMapperTest</span> &#123;</span><br><span class="line">	<span class="comment">// 원본데이터에서 파싱을 제대로 하는 지 확인</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">processesValidRecord</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">        <span class="type">Text</span> <span class="variable">value</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;0043011990999991950051518004+68750+023550FM-12+0382&quot;</span> +</span><br><span class="line">        	                          <span class="comment">// Year ^^^^ = 1950년</span></span><br><span class="line">			<span class="string">&quot;99999V0203201N00261220001CN9999999N9-00111+99999999999&quot;</span>);</span><br><span class="line">													<span class="comment">// Temperature ^^^^^ -11도</span></span><br><span class="line">		<span class="keyword">new</span> <span class="title class_">MapDriver</span>&lt;LongWritable, Text, Text, IntWritable&gt;()</span><br><span class="line">			.withMapper(<span class="keyword">new</span> <span class="title class_">MaxTemperatureMapper</span>()) <span class="comment">// 작성한 매퍼</span></span><br><span class="line">			.withInput(<span class="keyword">new</span> <span class="title class_">LongWritable</span>(<span class="number">0</span>), value) <span class="comment">// 한 행 짜리 데이터 넣어보기</span></span><br><span class="line">			.withOutput(<span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;1950&quot;</span>), <span class="keyword">new</span> <span class="title class_">IntWritable</span>(-<span class="number">11</span>)) <span class="comment">// 맵아웃풋 일치 테스트</span></span><br><span class="line">			.runTest();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 원본데이터에 +9999은 기온에 대한 결측값을 의미하는데 제대로 출력하는 지 확인</span></span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">ignoresMissingTemperatureRecord</span><span class="params">()</span> <span class="keyword">throws</span> IOException,</span><br><span class="line">			InterruptedException &#123;</span><br><span class="line">		<span class="type">Text</span> <span class="variable">value</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;0043011990999991950051518004+68750+023550FM-12+0382&quot;</span> +</span><br><span class="line">									  <span class="comment">// Year ^^^^ = 1950년</span></span><br><span class="line">        	<span class="string">&quot;99999V0203201N00261220001CN9999999N9+99991+99999999999&quot;</span>);</span><br><span class="line">								  <span class="comment">// Temperature ^^^^^</span></span><br><span class="line">		<span class="keyword">new</span> <span class="title class_">MapDriver</span>&lt;LongWritable, Text, Text, IntWritable&gt;()</span><br><span class="line">			.withMapper(<span class="keyword">new</span> <span class="title class_">MaxTemperatureMapper</span>()) <span class="comment">// 작성한 매퍼</span></span><br><span class="line">			.withInput(<span class="keyword">new</span> <span class="title class_">LongWritable</span>(<span class="number">0</span>), value) <span class="comment">// 결측값 출력을 안하는 지 확인</span></span><br><span class="line">			.runTest();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>원본데이터에 +9999은 기온에 대한 결측값을 의미한다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MaxTemperatureReducerTest</span> &#123;</span><br><span class="line">	<span class="meta">@Test</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">returnsMaximumIntegerInValues</span><span class="params">()</span> <span class="keyword">throws</span> IOException,</span><br><span class="line">			InterruptedException &#123;</span><br><span class="line">		<span class="keyword">new</span> <span class="title class_">ReduceDriver</span>&lt;Text, IntWritable, Text, IntWritable&gt;()</span><br><span class="line">			.withReducer(<span class="keyword">new</span> <span class="title class_">MaxTemperatureReducer</span>())</span><br><span class="line">			.withInput(<span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;1950&quot;</span>),</span><br><span class="line">				Arrays.asList(<span class="keyword">new</span> <span class="title class_">IntWritable</span>(<span class="number">10</span>), <span class="keyword">new</span> <span class="title class_">IntWritable</span>(<span class="number">5</span>))) <span class="comment">// 1950년 [10도, 5도] 넣었을 때</span></span><br><span class="line">			.withOutput(<span class="keyword">new</span> <span class="title class_">Text</span>(<span class="string">&quot;1950&quot;</span>), <span class="keyword">new</span> <span class="title class_">IntWritable</span>(<span class="number">10</span>)) <span class="comment">// 1950년 10도 나오는 지 확인</span></span><br><span class="line">			.runTest();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-Tool-인터페이스를-활용해-로컬에서-디버깅"><a href="#2-3-Tool-인터페이스를-활용해-로컬에서-디버깅" class="headerlink" title="2.3 Tool 인터페이스를 활용해 로컬에서 디버깅"></a>2.3 <code>Tool</code> 인터페이스를 활용해 로컬에서 디버깅</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MaxTemperatureDriver</span> <span class="keyword">extends</span> <span class="title class_">Configured</span> <span class="keyword">implements</span> <span class="title class_">Tool</span> &#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">run</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="comment">//1. 맵리듀스를 실행하기 위한 job을 생성</span></span><br><span class="line">		<span class="type">Job</span> <span class="variable">job</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Job</span>(getConf(), <span class="string">&quot;Max temperature&quot;</span>);</span><br><span class="line">		job.setJarByClass(getClass());</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//2. job을 처리할 실제 클래스에 대한 정보를 정의(Mapper, Reducer, Driver)</span></span><br><span class="line">        job.setMapperClass(MaxTemperatureMapper.class);</span><br><span class="line">        job.setCombinerClass(MaxTemperatureReducer.class);</span><br><span class="line">        job.setReducerClass(MaxTemperatureReducer.class);        </span><br><span class="line"></span><br><span class="line">        <span class="comment">//3. input데이터와 output데이터의 포맷을 정의</span></span><br><span class="line">        job.setInputFormatClass(TextInputFormat.class);</span><br><span class="line">        job.setOutputFormatClass(TextOutputFormat.class);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//4. 리듀서의 출력데이터에 대한 key와 value의 타입을 명시</span></span><br><span class="line">        job.setOutputKeyClass(Text.class);</span><br><span class="line">		job.setOutputValueClass(IntWritable.class);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//5. hdfs에 저장된 파일을 읽어오고 처리결과를 저장할 수 있도록 path정보를 설정</span></span><br><span class="line">        FileInputFormat.addInputPath(job, <span class="keyword">new</span> <span class="title class_">Path</span>(args[<span class="number">0</span>]));</span><br><span class="line">		FileOutputFormat.setOutputPath(job, <span class="keyword">new</span> <span class="title class_">Path</span>(args[<span class="number">1</span>]));</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> job.waitForCompletion(<span class="literal">true</span>) ? <span class="number">0</span> : <span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">exitCode</span> <span class="operator">=</span> ToolRunner.run(<span class="keyword">new</span> <span class="title class_">MaxTemperatureDriver</span>(), args);</span><br><span class="line">		System.exit(exitCode);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop test.MaxTemperatureDriver -fs file:/// -jt local input/ncdc/micro output</span><br></pre></td></tr></table></figure>
+
+<p><code>-fs file:///</code>은 로컬파일시스템을 의미하고, <code>-jt local</code>은 로컬에서 실행함을 의미한다.</p>
+<p><code>input/ncdc/micro</code>에 있는 소량의 데이터를 갖고 로컬환경에서 실행할 경우 디버깅에 장점이 있다.</p>
+<h2 id="2-4-클러스터에서-실행"><a href="#2-4-클러스터에서-실행" class="headerlink" title="2.4 클러스터에서 실행"></a>2.4 클러스터에서 실행</h2><p>프로젝트 단위로 빌드한 후에 <code>.jar</code> 파일을 이용해 잡을 실행한다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop jar hadoop-examples.jar v2.MaxTemperatureDriver -conf conf/hadoop-cluster.xml input/ncdc/all output</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-5-잡-디버깅"><a href="#2-5-잡-디버깅" class="headerlink" title="2.5 잡 디버깅"></a>2.5 잡 디버깅</h2><ol>
+<li>태스크의 상태 메시지를 갱신하는 코드 추가</li>
+<li>잘못된 값을 가진 레코드 수를 세는 카운터 추가</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Mapper</span>... &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="variable">OVER_1000</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">CustomParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CustomParser</span>();</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">map</span><span class="params">(K1 k1, V1 v1, Contexxt context)</span> &#123;</span><br><span class="line">        parser.parse(value);</span><br><span class="line">		<span class="keyword">if</span> (parser.isValid()) &#123;</span><br><span class="line">			<span class="type">V2</span> <span class="variable">v2</span> <span class="operator">=</span> parser.getV2();</span><br><span class="line">            <span class="comment">// 유효하긴 한데 너무 이상하다고 케이스의 경우, </span></span><br><span class="line">			<span class="keyword">if</span> (v2 &gt; <span class="number">1000</span>) &#123;</span><br><span class="line">				System.err.println(<span class="string">&quot;[LOG] : 값이 1000을 넘는다&quot;</span>);</span><br><span class="line">                <span class="comment">// 맵태스크 상태메시지를 갱신</span></span><br><span class="line">                context.setStatus(<span class="string">&quot;Detected possibly corrupt record: see logs.&quot;</span>);</span><br><span class="line">                <span class="comment">// 잘못된 값을 가진 레코드 수를 세는 카운터</span></span><br><span class="line">                context.getCounter(OVER_1000).increment(<span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">			context.write(<span class="keyword">new</span> <span class="title class_">Text</span>(parset.getK2()), <span class="keyword">new</span> <span class="title class_">IntWritable</span>(v2));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-맵리듀스-작동방식"><a href="#3-맵리듀스-작동방식" class="headerlink" title="3. 맵리듀스 작동방식"></a>3. 맵리듀스 작동방식</h1><h2 id="3-1-MapReduce-on-YARN"><a href="#3-1-MapReduce-on-YARN" class="headerlink" title="3.1 MapReduce on YARN"></a>3.1 MapReduce on YARN</h2><p><strong>용어 정리</strong></p>
+<ul>
+<li>입력스플릿 : 맵퍼 객체하나가 처리하게 될 블록 단위 데이터</li>
+<li>컨테이너 : 시스템자원 &#x2F; NM은 컨테이너 단위로 APP을 실행한다</li>
+</ul>
+<img src="/2022/04/13/04-MapReduceOnYARN/YARN_MAPREDUCE.png" class="">
+
+<p>맵태스크는 입력스플릿이 로컬디스크에 있을 때 최적이다.</p>
+<p>그렇기에 스플릿크기 최대크기를 블록크기에 맞춰져있는게 디폴트이다.</p>
+<p>모든 잡태스크는 상태정보를 갖는다.</p>
+<ul>
+<li>상태 : 성공, 실패, 진행중</li>
+<li>진행상황 : 태스크 완료 비율, …</li>
+<li>카운터 값</li>
+<li>상태메세지</li>
+</ul>
+<p>이들은 리소스 매니저 웹 UI에서 확인할 수 있다.</p>
+<h2 id="3-2-Shuffle-on-MapReduce"><a href="#3-2-Shuffle-on-MapReduce" class="headerlink" title="3.2 Shuffle on MapReduce"></a>3.2 Shuffle on MapReduce</h2><p><strong>셔플</strong> : 맵퍼의 출력을 키값 기준으로 병합시켜서 <strong>리듀서의 입력으로 넣는 과정</strong></p>
+<p><strong>용어정리</strong></p>
+<ul>
+<li>파티션 &#x3D; 리듀서의 인풋</li>
+<li>파티션 수 &#x3D; 리듀서 수</li>
+<li>병합계수 &#x3D; 맵아웃풋 몇개 모으고 병합할 지 &#x2F; <code>mr.task.io.sort.factor</code> &#x2F; 디폴트 10</li>
+</ul>
+<img src="/2022/04/13/04-MapReduceOnYARN/SHUFFLING.png" class="">
+
+<p>가능하면 셔플링(Sort phase)을 메모리상에서만 하고 싶으니 셔플에 많은 메모리 할당 추천</p>
+<p>맵리듀스 함수를 작성할 땐 적은 메모리를 사용하게끔 작성하는 것 역시 중요</p>
+<h1 id="4-맵리듀스-타입과-입출력-포맷"><a href="#4-맵리듀스-타입과-입출력-포맷" class="headerlink" title="4. 맵리듀스 타입과 입출력 포맷"></a>4. 맵리듀스 타입과 입출력 포맷</h1><h2 id="4-1-기본-맵리듀스-잡"><a href="#4-1-기본-맵리듀스-잡" class="headerlink" title="4.1 기본 맵리듀스 잡"></a>4.1 기본 맵리듀스 잡</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">map : (K1, V1) =&gt; list(K2, V2)</span><br><span class="line">reduce : (K2, list(V2)) =&gt; list(K3, V3)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyMapper</span> <span class="keyword">extends</span> <span class="title class_">Mapper</span>&lt;K1, V1, K2, V2&gt; &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="type">MyRecordParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyRecordParser</span>();</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">map</span><span class="params">(K1 key, V1 value, Context&lt;K1, V1, K2, V2&gt; context)</span></span><br><span class="line">        	<span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">		<span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// parser.parse(v);</span></span><br><span class="line">        <span class="comment">// context.write(parser.getKey(), parser.getValue());</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyReducer</span> <span class="keyword">extends</span> <span class="title class_">Reducer</span>&lt;K2, V2, K3, V3&gt; &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> MyOutputs&lt;K3, V3&gt; myOutputs;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">reduce</span><span class="params">(K2 key, Iterable&lt;V2&gt; values, Context&lt;K2, V2, K3, V3&gt; context)</span></span><br><span class="line">        	<span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">		<span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// for(V2 value : values) &#123;&#125;</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// context.write(myOutputs.getKey(), myOutputs.getValue());</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MinimalMapReduceDefaults</span> <span class="keyword">extends</span> <span class="title class_">Configured</span> <span class="keyword">implements</span> <span class="title class_">Tool</span> &#123;</span><br><span class="line">	<span class="type">Job</span> <span class="variable">job</span> <span class="operator">=</span> JobBuilder.parseInputAndOutput(<span class="built_in">this</span>, getConf(), args);</span><br><span class="line">	</span><br><span class="line">    job.setInputFormatClass(TextInputFormat.class); <span class="comment">// 입력스플릿(~파일블록)을 키값레코드로 변환할 때 텍스트포맷으로 읽음</span></span><br><span class="line">    </span><br><span class="line">    job.setMapperClass(MyMapper.class); <span class="comment">// Mapper 고르기</span></span><br><span class="line">	</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * K1, V1 디폴트 = LongWritable, Text</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">	job.setMapOutputKeyClass(K2.class); <span class="comment">// Mapper 아웃풋 키 클래스</span></span><br><span class="line">    job.setMapOutputValueClass(V2.class); <span class="comment">// Mapper 아웃풋 밸류 클래스</span></span><br><span class="line">    </span><br><span class="line">    job.setPartitionerClass(HashPartitioner.class); <span class="comment">// 키값에 의해 파티션 나누기 ; 파티션 수 = 리듀서 수</span></span><br><span class="line"></span><br><span class="line">    job.setNumReduceTasks(<span class="number">1</span>); <span class="comment">// Reducer 개수 ; 디폴트 1개</span></span><br><span class="line">    job.setReducerClass(MyReducer.class); <span class="comment">// Reducer 고르기</span></span><br><span class="line">    </span><br><span class="line">    job.setOutputKeyClass(K3.class); <span class="comment">// Reducer 아웃풋 키 클래스</span></span><br><span class="line">    job.setOutputValueClass(V3.class); <span class="comment">// Reducer 아웃풋 밸류 클래스</span></span><br><span class="line">    </span><br><span class="line">    job.setOutputFormatClass(TextOutputFormat.class); <span class="comment">// 리듀서 아웃풋을 텍스트포맷으로 HDFS에 저장</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> job.waitFormatClass(<span class="literal">true</span>); <span class="comment">// See 3.1 MapReduce on YARN</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-2-입력포맷"><a href="#4-2-입력포맷" class="headerlink" title="4.2 입력포맷"></a>4.2 입력포맷</h2><p>하둡은 일반텍스트파일에서 데이터베이스에 이르기까지 다양한 유형의 데이터 포맷을 입력받을 수 있다.</p>
+<h3 id="4-2-1-입력스플릿-x3D-x3D-gt-레코드"><a href="#4-2-1-입력스플릿-x3D-x3D-gt-레코드" class="headerlink" title="4.2.1 입력스플릿 &#x3D;&#x3D;&gt; 레코드"></a>4.2.1 입력스플릿 &#x3D;&#x3D;&gt; 레코드</h3><ul>
+<li>입력 스플릿(입력 청크)은 여러개의 레코드로 나눠질 수 있으며,</li>
+<li><code>Mapper</code>는 <strong>하나의 레코드</strong>에서 키-값쌍을 뽑아내고 처리한다.</li>
+</ul>
+<p>레코드가 <code>Mapper</code>에 오기 전에 **<code>InputFormat</code>**은</p>
+<ul>
+<li>context와 상호작용하여</li>
+<li>입력스플릿을 생성하고</li>
+<li>레코드를 분리하는 역할을 한다.</li>
+</ul>
+<p>과정을 좀 더 디테일하게 적으면,</p>
+<ol>
+<li><p>ClientApp에서 <code>getSplits()</code>을 호출하면 MRAppMaster은 인풋스플릿들을 얻는다.</p>
+</li>
+<li><p>인풋스플릿들에 기반해 맵태스크를 스케줄링한다.</p>
+</li>
+<li><p>맵태스크는 <code>InputFormat.createRecordReader()</code>를 호출해 Record Iterator를 얻는다.</p>
+</li>
+<li><p>맵태스크는 Record Iterator를 사용해서 레코드의 키 값 쌍들을 생성한다. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Mapper의 run() 구현부</span></span><br><span class="line">...</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">(Context context)</span> <span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">        setup(context);</span><br><span class="line">        <span class="keyword">while</span> (context.nextKeyValue()) &#123;</span><br><span class="line">            map(context.getCurrentKey(), context.getCurrentValue(), context);</span><br><span class="line">        &#125;</span><br><span class="line">        cleanup(context);</span><br><span class="line">    &#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>Map 연산에는 오버헤드가 거의 없기 때문에 <code>MultithreadedMapper</code>는 거의 쓰지 않는다.</p>
+<p>다만, 맵 연산 중간에 외부서버와의 통신이 있다면 고려할만하다.</p>
+<h3 id="4-2-2-FileInputFormat"><a href="#4-2-2-FileInputFormat" class="headerlink" title="4.2.2 FileInputFormat"></a>4.2.2 FileInputFormat</h3><p><code>FileInputFormat&lt;K, V&gt;</code>은 파일을 원본데이터로 사용하는 모든 InputFormat 구현체의 기본클래스다.</p>
+<ul>
+<li><code>FileInputFormat&lt;K, V&gt;</code><ul>
+<li><code>TextInputFormat</code></li>
+<li><code>KeyValueTextInputFormat</code></li>
+<li><code>NLineInputFormat</code></li>
+<li><code>CombineFileInputFormat&lt;K, V&gt;</code></li>
+<li><code>SequenceFileInputFormat&lt;K, V&gt;</code><ul>
+<li><code>SequenceFileAsBinaryInputFormat</code></li>
+<li><code>SequenceFileAsTextInputFormat</code></li>
+<li><code>SequenceFileAsTextInputFilter&lt;K, V&gt;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="FileInputFormat-입력-경로"><a href="#FileInputFormat-입력-경로" class="headerlink" title="FileInputFormat : 입력 경로"></a>FileInputFormat : 입력 경로</h4><p>사용자는 드라이버 Application을 통해 입력경로의 집합을 입력한다.</p>
+<p>유연한 제어를 위해 <code>FileInputFormat</code>은 4가지 정적 메소드를 제공한다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">addInputPath</span><span class="params">(Job job, Path path)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">addInputPaths</span><span class="params">(Job job, String commaSeparatedPaths)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setInputPaths</span><span class="params">(Job job, Path path ... inputPaths)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setInputPaths</span><span class="params">(Job job, String commaSeparatedPaths)</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="FileInputFormat-입력-스플릿"><a href="#FileInputFormat-입력-스플릿" class="headerlink" title="FileInputFormat : 입력 스플릿"></a>FileInputFormat : 입력 스플릿</h4><p>대부분의 Application에서 스플릿의 크기는 HDFS 블록 크기와 똑같이 둔다.</p>
+<p>왜냐면, 맵 태스크와 동일한 로컬에 존재하는 블록 수가 줄어들기 떄문이다.</p>
+<h4 id="CombineFileInputFormat-lt-K-V-gt"><a href="#CombineFileInputFormat-lt-K-V-gt" class="headerlink" title="CombineFileInputFormat&lt;K, V&gt;"></a><code>CombineFileInputFormat&lt;K, V&gt;</code></h4><p>하둡은 작은 파일이 많을 때보단, 큰 파일이 적을 때 더 좋은 성능을 보인다.</p>
+<p>왜냐면, 빈공간의 스플릿(블록)이 많다면 맵태스크가 많아지기에 오버헤드가 발생한다.</p>
+<p><code>FileInputFormat</code>은 작은파일 하나에 하나의 스플릿을 생성한다.</p>
+<p>반면에, <code>CombineFileInputFormat&lt;K, V&gt;</code>는 여러개의 작은파일을 하나로 묶어서 스플릿을 생성한다.</p>
+<blockquote>
+<p>블록의 노드(+랙) 지역성을 고려하여 하나의 스플릿으로 묶는다.</p>
+</blockquote>
+<p>그러나 이 방법보단, 하나의 순차파일로 병합하는 방식을 추천한다.</p>
+<p>이미 HDFS에 많은 작은 파일로 올라와있다면, <code>CombineFileInputFormat</code>를 쓰는 것도 나쁘진 않다.</p>
+<h4 id="스플릿-방지-맵-연산에-파일하나를-입력받고-싶다면"><a href="#스플릿-방지-맵-연산에-파일하나를-입력받고-싶다면" class="headerlink" title="스플릿 방지 : 맵 연산에 파일하나를 입력받고 싶다면"></a>스플릿 방지 : 맵 연산에 파일하나를 입력받고 싶다면</h4><p>일부 Application에선 스플릿을 하지 않고, 단일 매퍼가 입력파일 전체를 처리하길 원한다.</p>
+<p>예를 들어, 파일의 모든 레코드가 정렬되어있는 지 확인하는 방법은 이전 레코드와 값비교를 순차적으로 하는 것이다.</p>
+<p>2가지 방법이 있다.</p>
+<ol>
+<li><p>최소 스플릿 크기(<code>mapreduce.input.fileinputformat.split.minsize</code>)를 <code>Long.MAX_VALUE</code>로 설정</p>
+</li>
+<li><p>혹은 구체화된 서브클래스에 isSplitable() 메소드를 <code>false</code> 반환하도록 오버라이딩 하는 것이다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">NonSplittableTextInputFormat</span> <span class="keyword">extends</span> <span class="title class_">TextInputFormat</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="type">boolean</span> <span class="title function_">isSplitable</span><span class="params">(JobContext context, Path file)</span> &#123;</span><br><span class="line">    	<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="파일-전체-x3D-x3D-gt-하나의-레코드"><a href="#파일-전체-x3D-x3D-gt-하나의-레코드" class="headerlink" title="파일 전체 &#x3D;&#x3D;&gt; 하나의 레코드"></a>파일 전체 &#x3D;&#x3D;&gt; 하나의 레코드</h4><p>파일 전체내용을 하나의 레코드로 받고 싶을 때는 <code>FileInputFormat</code>를 상속받고</p>
+<ul>
+<li>한번에 파일 컨텐츠를 전달하는  <code>RecordReader</code>를 반환하도록 <code>createRecordReader</code>를 오버라이딩하면 된다.</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WholeFileInputFormat</span></span><br><span class="line">		<span class="keyword">extends</span> <span class="title class_">FileInputFormat</span>&lt;NullWritable, BytesWritable&gt; &#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">protected</span> <span class="type">boolean</span> <span class="title function_">isSplitable</span><span class="params">(JobContext context, Path file)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> RecordReader&lt;NullWritable, BytesWritable&gt; <span class="title function_">createRecordReader</span><span class="params">(</span></span><br><span class="line"><span class="params">				InputSplit split, TaskAttemptContext context)</span> <span class="keyword">throws</span> IOException,</span><br><span class="line">      		InterruptedException &#123;</span><br><span class="line">		<span class="type">WholeFileRecordReader</span> <span class="variable">reader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">WholeFileRecordReader</span>();</span><br><span class="line">		reader.initialize(split, context);</span><br><span class="line">		<span class="keyword">return</span> reader;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>그리고, 파일 컨텐츠를 전체를 전달하는  <code>RecordReader</code>를 작성하자.</p>
+<ul>
+<li><code>nextKeyValue</code>를 잘 오버라이딩하면 된다.</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">WholeFileRecordReader</span> <span class="keyword">extends</span> <span class="title class_">RecordReader</span>&lt;NullWritable, BytesWritable&gt; &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> FileSplit fileSplit; <span class="comment">// 파일스플릿</span></span><br><span class="line">	<span class="keyword">private</span> Configuration conf;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">BytesWritable</span> <span class="variable">value</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BytesWritable</span>();</span><br><span class="line">	<span class="keyword">private</span> <span class="type">boolean</span> <span class="variable">processed</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">initialize</span><span class="params">(InputSplit split, TaskAttemptContext context)</span></span><br><span class="line">			<span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">		<span class="built_in">this</span>.fileSplit = (FileSplit) split; <span class="comment">// 입력스플릿 =&gt; 파일스플릿</span></span><br><span class="line">		<span class="built_in">this</span>.conf = context.getConfiguration(); <span class="comment">// Conf 설정</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">nextKeyValue</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">		<span class="keyword">if</span> (!processed) &#123;</span><br><span class="line">			<span class="type">byte</span>[] contents = <span class="keyword">new</span> <span class="title class_">byte</span>[(<span class="type">int</span>) fileSplit.getLength()];</span><br><span class="line">			<span class="type">Path</span> <span class="variable">file</span> <span class="operator">=</span> fileSplit.getPath();</span><br><span class="line">			<span class="type">FileSystem</span> <span class="variable">fs</span> <span class="operator">=</span> file.getFileSystem(conf);</span><br><span class="line">			<span class="type">FSDataInputStream</span> <span class="variable">in</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				in = fs.open(file);</span><br><span class="line">				IOUtils.readFully(in, contents, <span class="number">0</span>, contents.length); <span class="comment">// 파일 =&gt; 바이트배열</span></span><br><span class="line">				value.set(contents, <span class="number">0</span>, contents.length); <span class="comment">// value 설정</span></span><br><span class="line">			&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">				IOUtils.closeStream(in);</span><br><span class="line">			&#125;</span><br><span class="line">			processed = <span class="literal">true</span>;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> NullWritable <span class="title function_">getCurrentKey</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">		<span class="keyword">return</span> NullWritable.get(); <span class="comment">// 레코드 구분 안지음</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> BytesWritable <span class="title function_">getCurrentValue</span><span class="params">()</span> <span class="keyword">throws</span> IOException,</span><br><span class="line">			InterruptedException &#123;</span><br><span class="line">		<span class="keyword">return</span> value;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">float</span> <span class="title function_">getProgress</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">		<span class="keyword">return</span> processed ? <span class="number">1.0f</span> : <span class="number">0.0f</span>; <span class="comment">// 단일 레코드 ==&gt; 성공 or 실패</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">()</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">		<span class="comment">// do nothing</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="입력스플릿-파일-정보-얻기"><a href="#입력스플릿-파일-정보-얻기" class="headerlink" title="입력스플릿 파일 정보 얻기"></a>입력스플릿 파일 정보 얻기</h4><p>Mapper와 상호작용하는 context 객체의 <code>getInputSplit()</code> 메서드를 호출해 스플릿에 대한 정보를 얻을 수 있다.</p>
+<p>또한, 그렇게 받은 인풋스플릿에서 <code>FileSplit</code>으로 형변환할 경우, 파일 정보에 접근할 수 있다.</p>
+<ul>
+<li><code>getPath()</code> : 처리할 입력파일의 경로</li>
+<li><code>getStart()</code> : 파일의 시작으로 부터 스플릿의 시작지점까지의 바이트 오프셋</li>
+<li><code>getLength()</code> : 스플릿의 바이트길이</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SmallFilesToSequenceFileConverter</span> <span class="keyword">extends</span> <span class="title class_">Configured</span></span><br><span class="line">		<span class="keyword">implements</span> <span class="title class_">Tool</span> &#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// 매퍼 정의</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">	<span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">SequenceFileMapper</span></span><br><span class="line">			<span class="keyword">extends</span> <span class="title class_">Mapper</span>&lt;NullWritable, BytesWritable, Text, BytesWritable&gt; &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">private</span> Text filenameKey; <span class="comment">// 키 = 파일명</span></span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">setup</span><span class="params">(Context context)</span> <span class="keyword">throws</span> IOException, <span class="comment">// 맵 연산 전의 실행함수</span></span><br><span class="line">                InterruptedException &#123;</span><br><span class="line">            <span class="type">InputSplit</span> <span class="variable">split</span> <span class="operator">=</span> context.getInputSplit();</span><br><span class="line">            <span class="type">Path</span> <span class="variable">path</span> <span class="operator">=</span> ((FileSplit) split).getPath();</span><br><span class="line">            filenameKey = <span class="keyword">new</span> <span class="title class_">Text</span>(path.toString());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">map</span><span class="params">(NullWritable key, BytesWritable value, Context context)</span></span><br><span class="line">                <span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line">            context.write(filenameKey, value); <span class="comment">// HDFS에 맵 결과 저장</span></span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// 드라이버 정의</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">run</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">		<span class="type">Job</span> <span class="variable">job</span> <span class="operator">=</span> JobBuilder.parseInputAndOutput(<span class="built_in">this</span>, getConf(), args); <span class="comment">// JOB 설정</span></span><br><span class="line">		<span class="keyword">if</span> (job == <span class="literal">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		job.setInputFormatClass(WholeFileInputFormat.class); <span class="comment">// 매퍼 컨텍스트 변환</span></span><br><span class="line">		job.setOutputFormatClass(SequenceFileOutputFormat.class); <span class="comment">// 바이트형</span></span><br><span class="line"></span><br><span class="line">		job.setOutputKeyClass(Text.class);</span><br><span class="line">		job.setOutputValueClass(BytesWritable.class);</span><br><span class="line"></span><br><span class="line">		job.setMapperClass(SequenceFileMapper.class);</span><br><span class="line">		<span class="comment">// 리듀서 미지정 ==&gt; 항등함수(디폴트)</span></span><br><span class="line">		<span class="keyword">return</span> job.waitForCompletion(<span class="literal">true</span>) ? <span class="number">0</span> : <span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">		<span class="type">int</span> <span class="variable">exitCode</span> <span class="operator">=</span> ToolRunner.run(<span class="keyword">new</span> <span class="title class_">SmallFilesToSequenceFileConverter</span>(), args);</span><br><span class="line">		System.exit(exitCode);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// hadoop jar hadoop-examples.jar SmallFilesToSequenceFileConverter \</span></span><br><span class="line"><span class="comment">// -conf conf/hadoop-localhost.xml -D mapreduce.job.reduces=2 \</span></span><br><span class="line"><span class="comment">// input/smallfiles output</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-3-텍스트-입력"><a href="#4-2-3-텍스트-입력" class="headerlink" title="4.2.3 텍스트 입력"></a>4.2.3 텍스트 입력</h3><p>하둡은 비정형 텍스트를 처리하는데 탁월하다.</p>
+<h4 id="TextInputFormat"><a href="#TextInputFormat" class="headerlink" title="TextInputFormat"></a><code>TextInputFormat</code></h4><ul>
+<li>하둡의 기본 InputFormat이다.</li>
+<li>각 레코드는 입력 데이터의 한 행이다.</li>
+<li>키(LongWritable)는 행의 시작점까지의 바이트 오프셋이다.</li>
+<li>값(Text)은 행 내용이다.</li>
+</ul>
+<p>행의 끝이 스플릿의 끝이 아닌 경우는 빈번하게 있으나, offset을 계속 끌고가기 때문에 추가로 이어서 읽는 것은 약간의 오버헤드만 가질 뿐 큰 문제는 없다.</p>
+<p>행의 길이가 너무 길어서 메모리에 영향을 줄 수 있는 경우엔, <code>mapreduce.input.linerecordreader.line.maxlength</code>를 설정하자.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">On the top of the Crumpetty Tree</span><br><span class="line">The Quangle Wangle sat,</span><br><span class="line">But his face you could not see,</span><br><span class="line">On account of his Beaver Hat.</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(0, On the top of the Crumpetty Tree)</span><br><span class="line">(33, The Quangle Wangle sat,)</span><br><span class="line">(57, But his face you could not see,)</span><br><span class="line">(89, On account of his Beaver Hat.)</span><br></pre></td></tr></table></figure>
+
+<h4 id="KeyValueTextInputFormat"><a href="#KeyValueTextInputFormat" class="headerlink" title="KeyValueTextInputFormat"></a><code>KeyValueTextInputFormat</code></h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">line1	On the top of the Crumpetty Tree</span><br><span class="line">line2	The Quangle Wangle sat,</span><br><span class="line">line3	But his face you could not see,</span><br><span class="line">line4	On account of his Beaver Hat.</span><br></pre></td></tr></table></figure>
+
+<p>위와 같은 탭으로 구분지어지는 separator가 있다면,</p>
+<p>separator를 설정하고 싶다면, <code>mapreduce.input.keyvaluelinerecordreader.key.value.separator</code>를 변경한다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(line1, On the top of the Crumpetty Tree)</span><br><span class="line">(line2, The Quangle Wangle sat,)</span><br><span class="line">(line3, But his face you could not see,)</span><br><span class="line">(line4, On account of his Beaver Hat.)</span><br></pre></td></tr></table></figure>
+
+<h4 id="NLineInputFormat"><a href="#NLineInputFormat" class="headerlink" title="NLineInputFormat"></a><code>NLineInputFormat</code></h4><p>매퍼가 받게될 스플릿의 행의 개수를 지정할 수도 있다.</p>
+<p>N값이 2라면 2번에 걸쳐서 받게 된다.</p>
+<p>소량의 데이터를 받아서 오랜 연산을 수행하는 애플리케이션에서 사용할 수 있다.</p>
+<h3 id="4-2-4-데이터베이스-입력-출력"><a href="#4-2-4-데이터베이스-입력-출력" class="headerlink" title="4.2.4 데이터베이스 입력 출력"></a>4.2.4 데이터베이스 입력 출력</h3><p>HBase… Sqoop…?</p>
+<h2 id="4-3-출력-포맷"><a href="#4-3-출력-포맷" class="headerlink" title="4.3 출력 포맷"></a>4.3 출력 포맷</h2><ul>
+<li><code>OutputFormat&lt;K, V&gt;</code><ul>
+<li><code>FileOutputFormat&lt;K, V&gt;</code><ul>
+<li><code>TextOutputFormat&lt;K, V&gt;</code></li>
+<li><code>SequenceFileOutputFormat&lt;K, V&gt;</code><ul>
+<li><code>SequenceFileAsBinaryOutputFormat</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>NullOutputFormat&lt;K, V&gt;</code></li>
+<li><code>DBOutputFormat&lt;K, V&gt;</code></li>
+<li><code>FilterOutputFormat&lt;K, V&gt;</code><ul>
+<li><code>LazyOutputFormat&lt;K, V&gt;</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-3-1-텍스트-출력-TextOutputFormat"><a href="#4-3-1-텍스트-출력-TextOutputFormat" class="headerlink" title="4.3.1 텍스트 출력 TextOutputFormat"></a>4.3.1 텍스트 출력 <code>TextOutputFormat</code></h3><ul>
+<li>하둡의 기본 출력 포맷</li>
+<li>어떤 타입의 키와 값을 쓰더라도 변환 가능 (내부적으로 <code>toString()</code> 로 변환)</li>
+<li>레코드 출력시 탭으로 키값쌍을 구분짓기 때문에, 다시 읽을 땐 <code>KeyValueTextInputFormat</code></li>
+</ul>
+<h3 id="4-3-2-바이너리-출력-SequenceFileOutputFormat"><a href="#4-3-2-바이너리-출력-SequenceFileOutputFormat" class="headerlink" title="4.3.2 바이너리 출력 SequenceFileOutputFormat"></a>4.3.2 바이너리 출력 <code>SequenceFileOutputFormat</code></h3><ul>
+<li>시퀀스 파일에 출력 결과 기록</li>
+<li>압축 용이</li>
+</ul>
+<h3 id="4-3-3-다중-출력-FileOutputFormat"><a href="#4-3-3-다중-출력-FileOutputFormat" class="headerlink" title="4.3.3 다중 출력 FileOutputFormat"></a>4.3.3 다중 출력 <code>FileOutputFormat</code></h3><ul>
+<li>출력 디렉터리에 다수의 파일을 생성한다.</li>
+<li>리듀서 하나당 하나의 파일</li>
+</ul>
+<p><strong>예제 : 데이터 파티셔닝</strong></p>
+<p>기상데이터셋을 같은 관측소별로 파티셔닝을 하기 위해선 두개의 작업이 필요하다.</p>
+<ol>
+<li><p>관측소 별로 파티션이 나뉘도록 파티셔너를 새로 만들고 잡의 파티셔너로 사용한다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StationPartitioner</span> <span class="keyword">extends</span> <span class="title class_">Partitioner</span>&lt;LongWritable, Text&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">NcdcRecordParser</span> <span class="variable">parser</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NcdcRecordParser</span>();</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getPartition</span><span class="params">(LongWritable key, Text value, <span class="type">int</span> numReduceTasks)</span> &#123;</span><br><span class="line">		parser.parse(value);</span><br><span class="line">        <span class="keyword">return</span> getPartition(parser.getStationId()) % numReduceTasks;</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> <span class="title function_">getPartition</span><span class="params">(String stationId)</span> &#123;</span><br><span class="line">		<span class="comment">//...</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    	<span class="comment">//return p;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>리듀서의 숫자를 관측소의 숫자만큼 만들고 <code>FileOutputFormat</code>을 사용해 파일을 출력한다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">job.setNumReduceTasks(numStations);</span><br><span class="line">job.setOutputFormatClass(FileOutputFormat.class);</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>이 방식에는 2가지 문제가 있다.</p>
+<ul>
+<li>전체 관측소 숫자가 몇개인 지 모르며, 메타데이터에 적혀있더라도 일치한다는 보장이 없다.</li>
+<li>불균등한 파티션 문제로 인해, 적게 일하는 리듀서수가 많다면 태스크 실행 오버헤드가 생긴다.</li>
+</ul>
+<p>왠만하면, 파티션의 수는 클러스터에게 맞기는 것이 훨씬 계산적으로 효율적이다.</p>
+<p>파티션 내에서 리듀서가 다수의 파일을 기록하는 것이 필요하다.</p>
+<h3 id="4-3-4-다중-출력-MultipleOutputs"><a href="#4-3-4-다중-출력-MultipleOutputs" class="headerlink" title="4.3.4 다중 출력 MultipleOutputs"></a>4.3.4 다중 출력 <code>MultipleOutputs</code></h3><ul>
+<li>리듀서, 또는 맵단독잡의 매퍼가 하나 이상의 파일을 생성하게 해준다.</li>
+<li><code>name-r-nnnnn</code> &#x2F; <code>name-m-nnnnn</code></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">public class PartitionByStationUsingMultipleOutputs extends Configured</span><br><span class="line">		implements Tool &#123;</span><br><span class="line">  </span><br><span class="line">	static class StationMapper</span><br><span class="line">			extends Mapper&lt;LongWritable, Text, Text, Text&gt; &#123;</span><br><span class="line">  </span><br><span class="line">		private NcdcRecordParser parser = new NcdcRecordParser();</span><br><span class="line">    </span><br><span class="line">    	@Override</span><br><span class="line">        protected void map(LongWritable key, Text value, Context context)</span><br><span class="line">				throws IOException, InterruptedException &#123;</span><br><span class="line">			parser.parse(value);</span><br><span class="line">			context.write(new Text(parser.getStationId()), value); // 키 = 관측소</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">  </span><br><span class="line">	static class MultipleOutputsReducer</span><br><span class="line">			extends Reducer&lt;Text, Text, NullWritable, Text&gt; &#123;</span><br><span class="line">    </span><br><span class="line">		private MultipleOutputs&lt;NullWritable, Text&gt; multipleOutputs;</span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line">		protected void setup(Context context) // 리듀스 연산 전에 multipleOutputs 생성</span><br><span class="line">				throws IOException, InterruptedException &#123;</span><br><span class="line">			multipleOutputs = new MultipleOutputs&lt;NullWritable, Text&gt;(context);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line">		protected void reduce(Text key, Iterable&lt;Text&gt; values, Context context)</span><br><span class="line">				throws IOException, InterruptedException &#123;</span><br><span class="line">			for (Text value : values) &#123;</span><br><span class="line">				// context 대신 multipleOutputs 에 write</span><br><span class="line">				// (output key, output value, output path)</span><br><span class="line">				multipleOutputs.write(NullWritable.get(), value, key.toString());</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		@Override</span><br><span class="line">    	protected void cleanup(Context context)</span><br><span class="line">				throws IOException, InterruptedException &#123;</span><br><span class="line">			multipleOutputs.close();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line">	public int run(String[] args) throws Exception &#123;</span><br><span class="line">		Job job = JobBuilder.parseInputAndOutput(this, getConf(), args);</span><br><span class="line">		if (job == null) &#123;</span><br><span class="line">			return -1;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		job.setMapperClass(StationMapper.class);</span><br><span class="line">		job.setMapOutputKeyClass(Text.class);</span><br><span class="line">		job.setReducerClass(MultipleOutputsReducer.class);</span><br><span class="line">		job.setOutputKeyClass(NullWritable.class);</span><br><span class="line"></span><br><span class="line">		return job.waitForCompletion(true) ? 0 : 1;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws Exception &#123;</span><br><span class="line">		int exitCode = ToolRunner.run(new PartitionByStationUsingMultipleOutputs(),</span><br><span class="line">				args);</span><br><span class="line">		System.exit(exitCode);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 순수하게 관측소를 basepath로 설정할 경우</span><br><span class="line">output/010010-99999-r-00027</span><br><span class="line">output/010050-99999-r-00013</span><br><span class="line">output/010100-99999-r-00015</span><br><span class="line">output/010280-99999-r-00014</span><br><span class="line">output/010550-99999-r-00000</span><br><span class="line">output/010980-99999-r-00011</span><br><span class="line">output/011060-99999-r-00025</span><br><span class="line">output/012030-99999-r-00029</span><br><span class="line">output/012350-99999-r-00018</span><br><span class="line">output/012620-99999-r-00004</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">      <span class="type">String</span> <span class="variable">basePath</span> <span class="operator">=</span> String.format(<span class="string">&quot;%s/%s/part&quot;</span>, <span class="comment">// 관측소/연도/part....</span></span><br><span class="line">		parser.getStationId(), parser.getYear());</span><br><span class="line">multipleOutputs.write(NullWritable.get(), value, basePath);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 관측소/연도/part 로 설정할 경우</span><br><span class="line">output/010010-99999/1901/part-r-00027</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-맵리듀스-고급-기능"><a href="#5-맵리듀스-고급-기능" class="headerlink" title="5. 맵리듀스 고급 기능"></a>5. 맵리듀스 고급 기능</h1><h2 id="5-1-카운터"><a href="#5-1-카운터" class="headerlink" title="5.1 카운터"></a>5.1 카운터</h2><h2 id="5-2-정렬"><a href="#5-2-정렬" class="headerlink" title="5.2 정렬"></a>5.2 정렬</h2><h2 id="5-3-조인"><a href="#5-3-조인" class="headerlink" title="5.3 조인"></a>5.3 조인</h2>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/YARN/" rel="tag"># YARN</a>
+              <a href="/tags/MapReduce/" rel="tag"># MapReduce</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/13/03-HDFS/" rel="prev" title="03 HDFS">
+      <i class="fa fa-chevron-left"></i> 03 HDFS
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%EC%9D%BC%EB%8B%A8-%EC%8B%A4%ED%96%89%ED%95%B4%EB%B3%B4%EA%B8%B0-%EC%9C%84%ED%95%9C-%EC%B5%9C%EC%86%8C%ED%95%9C%EC%9D%98-%EC%84%A4%EB%AA%85"><span class="nav-text">1. 일단 실행해보기 위한 최소한의 설명</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-MapReduce%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC-%EB%82%B4%EB%B6%80%EC%97%90%EC%84%9C-%EC%82%AC%EC%9A%A9%EB%90%98%EB%8A%94-%EB%8D%B0%EC%9D%B4%ED%84%B0-%ED%83%80%EC%9E%85"><span class="nav-text">1.1 MapReduce프레임워크 내부에서 사용되는 데이터 타입</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%EA%B8%B0%EB%B3%B8-%ED%8C%A8%ED%84%B4"><span class="nav-text">1.2 기본 패턴</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-1-Mapper"><span class="nav-text">1.2.1 Mapper</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-2-Reducer"><span class="nav-text">1.2.2 Reducer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-3-Driver"><span class="nav-text">1.2.3 Driver</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%EB%A7%B5%EB%A6%AC%EB%93%80%EC%8A%A4-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D"><span class="nav-text">2. 맵리듀스 프로그래밍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%EB%A7%B5%EB%A6%AC%EB%93%80%EC%8A%A4-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-%EC%A0%88%EC%B0%A8"><span class="nav-text">2.1 맵리듀스 프로그래밍 절차</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-mrunit%EC%9C%BC%EB%A1%9C-%EC%9C%A0%EB%8B%9B%ED%85%8C%EC%8A%A4%ED%8A%B8"><span class="nav-text">2.2 mrunit으로 유닛테스트</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Tool-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%B4-%EB%A1%9C%EC%BB%AC%EC%97%90%EC%84%9C-%EB%94%94%EB%B2%84%EA%B9%85"><span class="nav-text">2.3 Tool 인터페이스를 활용해 로컬에서 디버깅</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0%EC%97%90%EC%84%9C-%EC%8B%A4%ED%96%89"><span class="nav-text">2.4 클러스터에서 실행</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-%EC%9E%A1-%EB%94%94%EB%B2%84%EA%B9%85"><span class="nav-text">2.5 잡 디버깅</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%EB%A7%B5%EB%A6%AC%EB%93%80%EC%8A%A4-%EC%9E%91%EB%8F%99%EB%B0%A9%EC%8B%9D"><span class="nav-text">3. 맵리듀스 작동방식</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-MapReduce-on-YARN"><span class="nav-text">3.1 MapReduce on YARN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-Shuffle-on-MapReduce"><span class="nav-text">3.2 Shuffle on MapReduce</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%EB%A7%B5%EB%A6%AC%EB%93%80%EC%8A%A4-%ED%83%80%EC%9E%85%EA%B3%BC-%EC%9E%85%EC%B6%9C%EB%A0%A5-%ED%8F%AC%EB%A7%B7"><span class="nav-text">4. 맵리듀스 타입과 입출력 포맷</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%EA%B8%B0%EB%B3%B8-%EB%A7%B5%EB%A6%AC%EB%93%80%EC%8A%A4-%EC%9E%A1"><span class="nav-text">4.1 기본 맵리듀스 잡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-%EC%9E%85%EB%A0%A5%ED%8F%AC%EB%A7%B7"><span class="nav-text">4.2 입력포맷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-1-%EC%9E%85%EB%A0%A5%EC%8A%A4%ED%94%8C%EB%A6%BF-x3D-x3D-gt-%EB%A0%88%EC%BD%94%EB%93%9C"><span class="nav-text">4.2.1 입력스플릿 &#x3D;&#x3D;&gt; 레코드</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-2-FileInputFormat"><span class="nav-text">4.2.2 FileInputFormat</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#FileInputFormat-%EC%9E%85%EB%A0%A5-%EA%B2%BD%EB%A1%9C"><span class="nav-text">FileInputFormat : 입력 경로</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FileInputFormat-%EC%9E%85%EB%A0%A5-%EC%8A%A4%ED%94%8C%EB%A6%BF"><span class="nav-text">FileInputFormat : 입력 스플릿</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CombineFileInputFormat-lt-K-V-gt"><span class="nav-text">CombineFileInputFormat&lt;K, V&gt;</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EC%8A%A4%ED%94%8C%EB%A6%BF-%EB%B0%A9%EC%A7%80-%EB%A7%B5-%EC%97%B0%EC%82%B0%EC%97%90-%ED%8C%8C%EC%9D%BC%ED%95%98%EB%82%98%EB%A5%BC-%EC%9E%85%EB%A0%A5%EB%B0%9B%EA%B3%A0-%EC%8B%B6%EB%8B%A4%EB%A9%B4"><span class="nav-text">스플릿 방지 : 맵 연산에 파일하나를 입력받고 싶다면</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%ED%8C%8C%EC%9D%BC-%EC%A0%84%EC%B2%B4-x3D-x3D-gt-%ED%95%98%EB%82%98%EC%9D%98-%EB%A0%88%EC%BD%94%EB%93%9C"><span class="nav-text">파일 전체 &#x3D;&#x3D;&gt; 하나의 레코드</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EC%9E%85%EB%A0%A5%EC%8A%A4%ED%94%8C%EB%A6%BF-%ED%8C%8C%EC%9D%BC-%EC%A0%95%EB%B3%B4-%EC%96%BB%EA%B8%B0"><span class="nav-text">입력스플릿 파일 정보 얻기</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-3-%ED%85%8D%EC%8A%A4%ED%8A%B8-%EC%9E%85%EB%A0%A5"><span class="nav-text">4.2.3 텍스트 입력</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TextInputFormat"><span class="nav-text">TextInputFormat</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#KeyValueTextInputFormat"><span class="nav-text">KeyValueTextInputFormat</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NLineInputFormat"><span class="nav-text">NLineInputFormat</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-4-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4-%EC%9E%85%EB%A0%A5-%EC%B6%9C%EB%A0%A5"><span class="nav-text">4.2.4 데이터베이스 입력 출력</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-%EC%B6%9C%EB%A0%A5-%ED%8F%AC%EB%A7%B7"><span class="nav-text">4.3 출력 포맷</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-1-%ED%85%8D%EC%8A%A4%ED%8A%B8-%EC%B6%9C%EB%A0%A5-TextOutputFormat"><span class="nav-text">4.3.1 텍스트 출력 TextOutputFormat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-2-%EB%B0%94%EC%9D%B4%EB%84%88%EB%A6%AC-%EC%B6%9C%EB%A0%A5-SequenceFileOutputFormat"><span class="nav-text">4.3.2 바이너리 출력 SequenceFileOutputFormat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-3-%EB%8B%A4%EC%A4%91-%EC%B6%9C%EB%A0%A5-FileOutputFormat"><span class="nav-text">4.3.3 다중 출력 FileOutputFormat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-4-%EB%8B%A4%EC%A4%91-%EC%B6%9C%EB%A0%A5-MultipleOutputs"><span class="nav-text">4.3.4 다중 출력 MultipleOutputs</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%EB%A7%B5%EB%A6%AC%EB%93%80%EC%8A%A4-%EA%B3%A0%EA%B8%89-%EA%B8%B0%EB%8A%A5"><span class="nav-text">5. 맵리듀스 고급 기능</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-%EC%B9%B4%EC%9A%B4%ED%84%B0"><span class="nav-text">5.1 카운터</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-%EC%A0%95%EB%A0%AC"><span class="nav-text">5.2 정렬</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-%EC%A1%B0%EC%9D%B8"><span class="nav-text">5.3 조인</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

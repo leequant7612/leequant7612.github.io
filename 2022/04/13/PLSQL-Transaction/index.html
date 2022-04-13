@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leequant7612.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="SQL문 만으로 구현이 어려운 작업을 수행하기 위해 오라클에서 제공하는 프로그래밍언어이다. 12345678910111213141516DECLARE    변수 및 상수, CURSOR,EXCEPTION선언등  &#x2F;&#x2F;선언부-선택사항 BEGIN    SQL,PL&#x2F;SQL문;   &#x2F;&#x2F;실행부-필수사항    EXCEPTION    BEGIN    에외처리 ;&#x2F;&#x2F;예외처리부-">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PLSQL+Transaction">
+<meta property="og:url" content="http://leequant7612.github.io/2022/04/13/PLSQL-Transaction/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="SQL문 만으로 구현이 어려운 작업을 수행하기 위해 오라클에서 제공하는 프로그래밍언어이다. 12345678910111213141516DECLARE    변수 및 상수, CURSOR,EXCEPTION선언등  &#x2F;&#x2F;선언부-선택사항 BEGIN    SQL,PL&#x2F;SQL문;   &#x2F;&#x2F;실행부-필수사항    EXCEPTION    BEGIN    에외처리 ;&#x2F;&#x2F;예외처리부-">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-04-13T01:17:59.000Z">
+<meta property="article:modified_time" content="2022-04-13T01:20:28.567Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="SQL">
+<meta property="article:tag" content="PLSQL">
+<meta property="article:tag" content="Transaction">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://leequant7612.github.io/2022/04/13/PLSQL-Transaction/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>PLSQL+Transaction | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://leequant7612.github.io/2022/04/13/PLSQL-Transaction/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PLSQL+Transaction
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-13 10:17:59 / Modified: 10:20:28" itemprop="dateCreated datePublished" datetime="2022-04-13T10:17:59+09:00">2022-04-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DB-SQL/" itemprop="url" rel="index"><span itemprop="name">DB/SQL</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>SQL문 만으로 구현이 어려운 작업을 수행하기 위해 오라클에서 제공하는 프로그래밍언어이다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">DECLARE</span><br><span class="line">    변수 및 상수, CURSOR,EXCEPTION선언등  //선언부-선택사항</span><br><span class="line"></span><br><span class="line"> BEGIN</span><br><span class="line"></span><br><span class="line">    SQL,PL/SQL문;   //실행부-필수사항</span><br><span class="line"></span><br><span class="line">    EXCEPTION</span><br><span class="line">    BEGIN</span><br><span class="line"></span><br><span class="line">    에외처리 ;//예외처리부-선택사항</span><br><span class="line"></span><br><span class="line">    END;</span><br><span class="line"></span><br><span class="line"> END;</span><br><span class="line"> /</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<h1 id="1-변수선언-및-할당"><a href="#1-변수선언-및-할당" class="headerlink" title="1. 변수선언 및 할당"></a>1. 변수선언 및 할당</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">변수명 [CONSTANT] 자료형 [NOT NULL] [:= 초기값 | DEFAULT 초기값 ];</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>v_num NUMBER;</code></li>
+<li><code>v_name VARCHAR2(10) :=&#39;홍길동&#39;</code>;</li>
+<li><code>v_name VARCHAR2(10) DEFAULT &#39;홍길동&#39;;</code></li>
+<li><code>V_PI CONSTANT  NUMBER(3,2) :=3.14;</code></li>
+</ul>
+<p>예시코드</p>
+<pre><code>// 바인드(호스트) 변수는 PL/SQL 블락의 결과를 담기 위한 변수
+var num number --바인드 변수 : PL/SQL 블락의 결과를 담기 위한 변수
+DECLARE
+    num NUMBER(2) := 10;
+    num2 NUMBER(2);
+    BEGIN
+        num2 := 2;
+        :num := num * num2; --바인드 변수는 : 로 참조
+    END;
+/
+
+SQL &gt;&gt; print num
+</code></pre>
+<h1 id="2-기본문법"><a href="#2-기본문법" class="headerlink" title="2. 기본문법"></a>2. 기본문법</h1><h2 id="2-1-연산자"><a href="#2-1-연산자" class="headerlink" title="2.1 연산자"></a>2.1 연산자</h2><ul>
+<li>산술 연산자 : <code>+</code>, <code>-</code>, <code>/</code>, <code>*</code></li>
+<li>비교 연산자:  <code>=</code>, <code>!=</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code> , <code>IS NULL</code>, <code>BETWEEN</code>, <code>IN</code></li>
+<li>논리 연산자: <code>AND</code> , <code>OR</code>, <code>NOT</code>등</li>
+</ul>
+<h2 id="2-2-제어"><a href="#2-2-제어" class="headerlink" title="2.2 제어"></a>2.2 제어</h2><h3 id="2-2-1-IF"><a href="#2-2-1-IF" class="headerlink" title="2.2.1 IF"></a>2.2.1 IF</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if 조건1 then</span><br><span class="line">elsif 조건2 then</span><br><span class="line">else</span><br><span class="line">end if;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// IF 문</span><br><span class="line">var result nvarchar2(10)</span><br><span class="line">declare</span><br><span class="line">	str nvarchar2(10) := &#x27;JAVA&#x27;;</span><br><span class="line">	begin</span><br><span class="line">		if str = &#x27;java&#x27; then</span><br><span class="line">			dbms_output.put_line(&#x27;str is &#x27; || &#x27;java&#x27;);</span><br><span class="line">			:result := &#x27;JAVA&#x27;;</span><br><span class="line">		elsif str=&#x27;jAVA&#x27; then</span><br><span class="line">			dbms_output.put_line(&#x27;str is &#x27; || &#x27;jAVA&#x27;);</span><br><span class="line">			:result := &#x27;jAVA&#x27;;</span><br><span class="line">		else</span><br><span class="line">			dbms_output.put_line(&#x27;str is &#x27; || &#x27;JAVA&#x27;);</span><br><span class="line">			:result := &#x27;JAVA&#x27;;</span><br><span class="line">		end if;</span><br><span class="line">	end;</span><br><span class="line">/</span><br><span class="line">print result</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-2-FOR"><a href="#2-2-2-FOR" class="headerlink" title="2.2.2 FOR"></a>2.2.2 FOR</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">for i in [reverse] 초기값 .. 종료값 loop</span><br><span class="line">end loop;</span><br></pre></td></tr></table></figure>
+
+<pre><code>SQL &gt;&gt; ED mysum
+
+----
+메모장 켜짐
+----
+
+SET SERVEROUT ON --DBMS_OUTPUT.PUT_LINE()함수를 사용하기 위한 설정
+
+ACCEPT p_init PROMPT &#39;initial value:&#39;
+ACCEPT p_end PROMPT &#39;final value:&#39;
+
+DECLARE 
+    v_init NUMBER := &amp;p_init;
+    v_end NUMBER := &amp;p_end;
+    v_sum NUMBER := 0;
+BEGIN
+    FOR i IN v_init .. &amp;p_end LOOP
+        IF MOD(i,2) = 0 THEN
+            v_sum := v_sum+i;
+        END IF;
+    END LOOP;	
+    DBMS_OUTPUT.PUT_LINE(v_init || &#39;==&gt;&#39; || &amp;p_end || &#39; ==&gt; cumsum :&#39; || v_sum);
+END;
+/
+SET SERVEROUT OFF
+
+----
+메모장 저장후닫기
+----
+SQL &gt;&gt; @mysum
+</code></pre>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">accept cnt prompt &#x27;데이터 갯수 입력&#x27;</span><br><span class="line">begin</span><br><span class="line">	for k in 1 .. &amp;cnt loop</span><br><span class="line">		insert into board values(seq_board.nextval, </span><br><span class="line">					&#x27;id&#x27; || seq_board.currval,</span><br><span class="line">					&#x27;title&#x27; || seq_board.currval);</span><br><span class="line">	end loop;</span><br><span class="line">	commit; -- 임시로 변경한 테이블을 다른 세션도 볼 수 있게 실제 테이블에 저장</span><br><span class="line">end;</span><br><span class="line">/</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-3-WHILE"><a href="#2-2-3-WHILE" class="headerlink" title="2.2.3 WHILE"></a>2.2.3 WHILE</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">while condition loop</span><br><span class="line">	[exit when 조건;]</span><br><span class="line">end loop;</span><br><span class="line"></span><br><span class="line">while 1=1 loop</span><br><span class="line">	exit when 조건;</span><br><span class="line">end loop;</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">set serverout on</span><br><span class="line">declare</span><br><span class="line">	hap number := 0;</span><br><span class="line">	k number := 1;</span><br><span class="line">begin</span><br><span class="line">	while k &lt;= 10 loop</span><br><span class="line">		hap := hap + k;</span><br><span class="line">		k := k + 1;</span><br><span class="line">	end loop;</span><br><span class="line">	dbms_output.put_line(&#x27;1 ~ 10 : &#x27; || hap);</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line">set serverout off</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-4-LOOP"><a href="#2-2-4-LOOP" class="headerlink" title="2.2.4 LOOP"></a>2.2.4 LOOP</h3><p>while과의 차이는 무조건 한번은 한다는 것</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">loop</span><br><span class="line">	statement1;</span><br><span class="line">	statement2;</span><br><span class="line">	exit [when condition];</span><br><span class="line">end loop;</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">set serverout on</span><br><span class="line">accept snum prompt &#x27;start number?&#x27;</span><br><span class="line">accept fnum prompt &#x27;final number?&#x27;</span><br><span class="line">declare</span><br><span class="line">	hap number := 0;</span><br><span class="line">    snum number := &amp;snum;</span><br><span class="line">begin</span><br><span class="line">    if snum &gt; &amp;fnum then</span><br><span class="line">        dbms_output.put_line(&#x27;start &gt; final&#x27;);</span><br><span class="line">	else</span><br><span class="line">        loop</span><br><span class="line">            hap := hap + snum;</span><br><span class="line">            snum := snum + 1;</span><br><span class="line">            exit when snum &gt; &amp;fnum;</span><br><span class="line">        end loop;</span><br><span class="line">        dbms_output.put_line(hap);</span><br><span class="line">	end if;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line">set serverout off</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-커서"><a href="#3-커서" class="headerlink" title="3. 커서"></a>3. 커서</h1><p><code>SELECT</code> 문장에 의해 여러행이 출력되었을 때 각 행에 접근할 수 있게 해주는 객체이다.</p>
+<blockquote>
+<p><code>SELECT INTO</code>는한행이 출력됐을 때만 사용할 수 있다. </p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">DECLARE</span><br><span class="line">	-- [1] 커서 생성</span><br><span class="line">	CURSOR 커서명 IS SELECT문장;</span><br><span class="line">BEGIN</span><br><span class="line">    -- [2] 커서 오픈 시, select문이 실행되고 커서는 첫 행에 위치하게 된다</span><br><span class="line">    OPEN 커서명;</span><br><span class="line">    -- [3] 커서 펫치하여 하나의 행을 읽어 들이고 다음 행으로 이동한다</span><br><span class="line">    FETCH 커서명 INTO variable;</span><br><span class="line">    -- [4] 커서 닫기</span><br><span class="line">    CLOSE 커서명;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>커서명%FOUND</code> : FETCH문에서 행이 추출되면 true</li>
+<li><code>커서명%NOTFOUND</code> :  FETCH문에서 행이 추출 안되면 true</li>
+<li><code>커서명%ROWCOUNT</code> : 현재까지 추출한 행 개수</li>
+<li><code>커서명%ISOPEN</code> : 커서가 열려있으면 true</li>
+</ul>
+<p>예시코드</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">accept deptno prompt &#x27;dept number ?&#x27;</span><br><span class="line"></span><br><span class="line">declare</span><br><span class="line">	cursor mycursor is</span><br><span class="line">		select ename, sal, dname, loc</span><br><span class="line">			from emp e join dept d on e.deptno = d.deptno</span><br><span class="line">			where e.deptno = &amp;deptno</span><br><span class="line">			order by sal;</span><br><span class="line">	var_name emp.ename%TYPE;</span><br><span class="line">	var_sal emp.sal%TYPE;</span><br><span class="line">	var_dname dept.dname%TYPE;</span><br><span class="line">	var_loc dept.loc%TYPE;</span><br><span class="line">begin</span><br><span class="line">	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">	[WHILE문 방식]	</span><br><span class="line">	open mycursor;</span><br><span class="line">	fetch mycursor into var_name, var_sal, var_dname, var_loc;</span><br><span class="line">	while mycursor%found loop</span><br><span class="line">		dbms_output.put_line(var_name || &#x27;:&#x27; || var_sal || &#x27;:&#x27; || var_loc);</span><br><span class="line">		fetch mycursor into var_name, var_sal, var_dname, var_loc;</span><br><span class="line">	end loop;</span><br><span class="line">	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">	[LOOP문 방식]</span><br><span class="line">	open mycursor;</span><br><span class="line">	loop</span><br><span class="line">		fetch mycursor into var_name, var_sal, var_dname, var_loc;</span><br><span class="line">		dbms_output.put_line(var_name || &#x27;:&#x27; || var_sal || &#x27;:&#x27; || var_loc);</span><br><span class="line">		exit when c1%NOTFOUND;</span><br><span class="line">	end loop;</span><br><span class="line">	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">	[FOR문 방식] : 자동 open/fetch/close</span><br><span class="line">	for v in mycursor loop</span><br><span class="line">		dbms_output.put_line(v.ename || &#x27;:&#x27; || v.sal || &#x27;:&#x27; || v.loc);</span><br><span class="line">	end loop;</span><br><span class="line">	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span><br><span class="line">end;</span><br><span class="line">/</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-1-Parametric-cursor"><a href="#3-1-Parametric-cursor" class="headerlink" title="3.1 Parametric cursor"></a>3.1 Parametric cursor</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">DECLARE</span><br><span class="line">	-- [1] 커서 생성</span><br><span class="line">	CURSOR 커서명(파라미터명 자료형, ...) IS SELECT문장with파라미터명;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-Implicit-cursor"><a href="#3-2-Implicit-cursor" class="headerlink" title="3.2 Implicit cursor"></a>3.2 Implicit cursor</h2><p>PL&#x2F;SQL 내부에서 DML 명령어와 <code>SELECT INTO</code>를 실행할 때 자동으로 생성된다.</p>
+<p>BEGIN 문에서 SQL 쿼리를 날리다보면 프로그램 내에서 서버와의 소통이 필요해질 수 있다.</p>
+<ul>
+<li><code>SQL%FOUND </code>: 가장 최근 사용한 SQL문에 의해 행이 변경되었으면 참 &#x2F; 아니면 거짓</li>
+<li><code>SQL%NOTFOUND</code></li>
+<li><code>SQL%ROWCOUNT</code> : 현재까지 추출한 행 수 &#x2F;가장 최근 사용한 DML문에 의해 영향받은 행의 개수</li>
+<li><code>SQL%ISOPEN</code> : 묵시적 커서는 SQL문 실행 후 자동으로 close하므로 항상 false</li>
+</ul>
+<h1 id="4-예외"><a href="#4-예외" class="headerlink" title="4. 예외"></a>4. 예외</h1><h2 id="4-1-사전에-정의된-예외들"><a href="#4-1-사전에-정의된-예외들" class="headerlink" title="4.1 사전에 정의된 예외들"></a>4.1 사전에 정의된 예외들</h2><ul>
+<li><code>NO_DATA_FOUND</code><ul>
+<li>데이터를 반환하지 않은 SELECT문</li>
+</ul>
+</li>
+<li><code>TOO_MANY_ROWS</code><ul>
+<li>두 개 이상을 반환한 SELECT문</li>
+</ul>
+</li>
+<li><code>ZERO_DIVIDE</code><ul>
+<li>0으로 나누기</li>
+</ul>
+</li>
+<li><code>DUP_VAL_ON_INDEX </code><ul>
+<li>UNIQUE COLUMN에 중복된 값을 입력할 때</li>
+</ul>
+</li>
+<li><code>INVALID_NUMBER</code><ul>
+<li>문자열을 숫자로 전환하지 못한 경우</li>
+</ul>
+</li>
+<li><code>INVALID_CURSOR</code><ul>
+<li>잘못된 CURSOR 연산 발생</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-2-예외처리"><a href="#4-2-예외처리" class="headerlink" title="4.2 예외처리"></a>4.2 예외처리</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">begin</span></span><br><span class="line">    main statement</span><br><span class="line">    EXCEPTION</span><br><span class="line">    <span class="keyword">WHEN</span> exception명<span class="number">1</span> <span class="keyword">THEN</span></span><br><span class="line">        statement1</span><br><span class="line">    <span class="keyword">WHEN</span> exception명<span class="number">2</span> <span class="keyword">THEN</span></span><br><span class="line">        statement2</span><br><span class="line">    <span class="keyword">when</span> others <span class="keyword">then</span></span><br><span class="line">    	statement3</span><br><span class="line"><span class="keyword">end</span>;</span><br><span class="line"><span class="operator">/</span></span><br></pre></td></tr></table></figure>
+
+<p>예시 코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">accept id prompt <span class="string">&#x27;id?&#x27;</span></span><br><span class="line">accept title prompt <span class="string">&#x27;title&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">declare</span></span><br><span class="line">	id board.id<span class="operator">%</span>type :<span class="operator">=</span> <span class="string">&#x27;&amp;id&#x27;</span>; <span class="comment">-- 호스트 변수로 초기화</span></span><br><span class="line">	title VARCHAR2(<span class="number">100</span>) :<span class="operator">=</span> <span class="string">&#x27;&amp;title&#x27;</span>;</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> board <span class="keyword">values</span>(seq_board.nextval, id, title);</span><br><span class="line">	if <span class="keyword">sql</span><span class="operator">%</span>found <span class="keyword">then</span></span><br><span class="line">		dbms_output.put_line(<span class="keyword">sql</span><span class="operator">%</span>rowcount <span class="operator">||</span> <span class="string">&#x27; rows added&#x27;</span>);</span><br><span class="line">		<span class="keyword">commit</span>;</span><br><span class="line">	<span class="keyword">end</span> if;</span><br><span class="line">	<span class="keyword">when</span> others <span class="keyword">then</span></span><br><span class="line">		<span class="keyword">rollback</span>;</span><br><span class="line">		dbms_output.put_line(<span class="string">&#x27;sql error message : &#x27;</span> <span class="operator">||</span> SQLERRM); <span class="comment">-- SQLERRM : 에러메시지	</span></span><br><span class="line"><span class="keyword">end</span>;</span><br><span class="line"><span class="operator">/</span></span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> <span class="keyword">member</span>(</span><br><span class="line">	username varchar2(<span class="number">10</span>) <span class="keyword">primary</span> key,</span><br><span class="line">	password varchar2(<span class="number">10</span>) <span class="keyword">not</span> <span class="keyword">null</span>,</span><br><span class="line">	name nvarchar2(<span class="number">10</span>) <span class="keyword">not</span> <span class="keyword">null</span>,</span><br><span class="line">	joindate <span class="type">date</span> <span class="keyword">default</span> sysdate);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> bbs(</span><br><span class="line">	<span class="keyword">no</span> number <span class="keyword">primary</span> key,</span><br><span class="line">	username varchar2(<span class="number">10</span>) <span class="keyword">references</span> <span class="keyword">member</span>(username),</span><br><span class="line">	title nvarchar2(<span class="number">50</span>) <span class="keyword">not</span> <span class="keyword">null</span>,</span><br><span class="line">	postdate <span class="type">date</span> <span class="keyword">default</span> sysdate);</span><br><span class="line"></span><br><span class="line">ed exception1</span><br><span class="line"><span class="comment">-------------</span></span><br><span class="line">accept username prompt <span class="string">&#x27;enter ID?&#x27;</span></span><br><span class="line"><span class="keyword">declare</span></span><br><span class="line">	username_ member.username<span class="operator">%</span>type :<span class="operator">=</span> <span class="string">&#x27;&amp;username&#x27;</span>;</span><br><span class="line">	name_ member.username<span class="operator">%</span>type;</span><br><span class="line">	<span class="comment">--val number; -- others 확인용</span></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">	<span class="comment">--select username, name into username_, name_ from member -- too_many_rows 확인용</span></span><br><span class="line">	<span class="keyword">select</span> username, name <span class="keyword">into</span> username_, name_ <span class="keyword">from</span> <span class="keyword">member</span> <span class="keyword">where</span> username<span class="operator">=</span>username_;</span><br><span class="line">	<span class="comment">--val := 100 / 0; -- others 확인용</span></span><br><span class="line">	dbms_output.put_line(<span class="string">&#x27;id : &#x27;</span> <span class="operator">||</span> username_ <span class="operator">||</span> <span class="string">&#x27;, name : &#x27;</span> <span class="operator">||</span> name_);</span><br><span class="line">	exception</span><br><span class="line">		<span class="keyword">when</span> too_many_rows <span class="keyword">then</span></span><br><span class="line">			dbms_output.put_line(<span class="string">&#x27;found multiple members&#x27;</span>);</span><br><span class="line">		<span class="keyword">when</span> no_data_found <span class="keyword">then</span></span><br><span class="line">			dbms_output.put_line(username_ <span class="operator">||</span> <span class="string">&#x27; : no such member&#x27;</span>);</span><br><span class="line">		<span class="keyword">when</span> others <span class="keyword">then</span></span><br><span class="line">			dbms_output.put_line(<span class="string">&#x27;err number : &#x27;</span> <span class="operator">||</span> sqlcode);</span><br><span class="line">			dbms_output.put_line(<span class="string">&#x27;err message : &#x27;</span> <span class="operator">||</span> sqlerrm);</span><br><span class="line"><span class="keyword">end</span>;</span><br><span class="line"><span class="operator">/</span></span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"><span class="variable">@exception1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">sql</span> <span class="operator">&gt;&gt;</span> <span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">member</span>(username, password, name) <span class="keyword">values</span>(<span class="string">&#x27;kimzz&#x27;</span>, <span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;KIM&#x27;</span>);</span><br><span class="line"><span class="keyword">sql</span> <span class="operator">&gt;&gt;</span> <span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">member</span>(username, password, name) <span class="keyword">values</span>(<span class="string">&#x27;leezz&#x27;</span>, <span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;LEE&#x27;</span>);</span><br><span class="line"><span class="keyword">sql</span> <span class="operator">&gt;&gt;</span> <span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">member</span>(username, password, name) <span class="keyword">values</span>(<span class="string">&#x27;parkzz&#x27;</span>, <span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;PARK&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">@exception1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-3-Custom-Exception"><a href="#4-3-Custom-Exception" class="headerlink" title="4.3 Custom Exception"></a>4.3 Custom Exception</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">accept age prompt <span class="string">&#x27;enter age?&#x27;</span></span><br><span class="line"><span class="keyword">declare</span> <span class="comment">-- 선언부에서 발생한 예외는 예외처리부에서 예외처리 불가</span></span><br><span class="line">	<span class="comment">--age number := &amp;age;</span></span><br><span class="line">	age number;</span><br><span class="line">	my_not_number exception;</span><br><span class="line">	pragma exception_init(MY_NOT_NUMBER, <span class="number">-01722</span>);</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">select</span> <span class="number">10</span> <span class="operator">+</span> <span class="string">&#x27;&amp;age&#x27;</span> <span class="keyword">into</span> age <span class="keyword">from</span> dual;</span><br><span class="line">    dbms_output.put_line(<span class="string">&#x27;your age after 10 years : &#x27;</span> <span class="operator">||</span> age);</span><br><span class="line">    exception</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    -- 방법1 : 오라클 제공 예외명 그대로 사용</span></span><br><span class="line"><span class="comment">	when invalid_number then</span></span><br><span class="line"><span class="comment">    	dbms_output.put_line(&#x27;age should be number&#x27;);</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    -- 방법2 : 에러번호를 나만의 예외명으로</span></span><br><span class="line"><span class="comment">	when invalid_number then</span></span><br><span class="line"><span class="comment">    	dbms_output.put_line(&#x27;age should be number&#x27;);</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="keyword">when</span> my_not_number <span class="keyword">then</span></span><br><span class="line">    	dbms_output.put_line(<span class="string">&#x27;age should be number 2222222222&#x27;</span>);</span><br><span class="line">    <span class="keyword">when</span> others <span class="keyword">then</span></span><br><span class="line">    	dbms_output.put_line(<span class="string">&#x27;err msg is -----------&#x27;</span> <span class="operator">||</span> sqlerrm);</span><br><span class="line"><span class="keyword">end</span>;</span><br><span class="line"><span class="operator">/</span></span><br></pre></td></tr></table></figure>
+
+<p>custom exception 만들기</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">accept num prompt <span class="string">&#x27; enter number ?&#x27;</span></span><br><span class="line"><span class="keyword">declare</span></span><br><span class="line">	<span class="comment">---</span></span><br><span class="line">	even_not_number exception;</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">	if <span class="built_in">mod</span>(<span class="operator">&amp;</span>num, <span class="number">2</span>) <span class="operator">=</span> <span class="number">0</span> <span class="keyword">then</span></span><br><span class="line">		raise even_not_number;</span><br><span class="line">	<span class="keyword">end</span> if;</span><br><span class="line">	dbms_output.put_line(<span class="operator">&amp;</span>num <span class="operator">||</span> <span class="string">&#x27;is odd&#x27;</span>);</span><br><span class="line">	exception</span><br><span class="line">	<span class="keyword">when</span> even_not_number <span class="keyword">then</span></span><br><span class="line">		dbms_output.put_line(<span class="string">&#x27;even number is not allowed&#x27;</span>);</span><br><span class="line"><span class="keyword">end</span>;</span><br><span class="line"><span class="operator">/</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="5-트랜잭션"><a href="#5-트랜잭션" class="headerlink" title="5. 트랜잭션"></a>5. 트랜잭션</h1><p>더이상 분할할 수 없는 최소 수행 단위 (SQL문 덩어리)</p>
+<p>이체는 3가지 일련의 작업으로 이뤄진다.</p>
+<ol>
+<li>가길동 100억 인출</li>
+<li>데이터 전송</li>
+<li>나길동 100억 입금</li>
+</ol>
+<p>이체같은 업무는 트랜잭션으로 처리하여 작업 다 됐을 때 commit을 한다.</p>
+<h2 id="5-1-트랜잭션-제어-명령어-TCL"><a href="#5-1-트랜잭션-제어-명령어-TCL" class="headerlink" title="5.1 트랜잭션 제어 명령어 (TCL)"></a>5.1 트랜잭션 제어 명령어 (TCL)</h2><ul>
+<li><code>COMMIT</code><ul>
+<li>다 성공해서, 현재 세션에서 수행한 트랜잭션을 데이터베이스에 영구적으로 반영</li>
+<li>DDL, DCL 문은 자동 커밋</li>
+<li>sqlplus 정상 종료시 자동 커밋</li>
+</ul>
+</li>
+<li><code>ROLLBACK</code><ul>
+<li>중간에 실패해서,  현재 세션에서 수행한 트랜잭션을 원래대로 돌린다</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> serverout <span class="keyword">on</span></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">	<span class="comment">--1. 수정작업</span></span><br><span class="line">	<span class="keyword">update</span> <span class="keyword">member</span> <span class="keyword">set</span> name<span class="operator">=</span><span class="string">&#x27;LEE2&#x27;</span> <span class="keyword">where</span> username<span class="operator">=</span><span class="string">&#x27;leezz&#x27;</span>;</span><br><span class="line">	<span class="comment">--2. 삭제작업</span></span><br><span class="line">	<span class="keyword">delete</span> <span class="keyword">member</span> <span class="keyword">where</span> username<span class="operator">=</span><span class="string">&#x27;parkzz&#x27;</span>;</span><br><span class="line">	<span class="comment">--3. 입력작업</span></span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">member</span>(username, password, name) <span class="keyword">values</span>(<span class="string">&#x27;leezzz&#x27;</span>, <span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;LEE3&#x27;</span>);</span><br><span class="line">	<span class="keyword">commit</span>;</span><br><span class="line">	dbms_output.put_line(<span class="string">&#x27;Transaction done!&#x27;</span>);</span><br><span class="line">	exception</span><br><span class="line">	<span class="keyword">when</span> others <span class="keyword">then</span></span><br><span class="line">		<span class="keyword">rollback</span>;</span><br><span class="line"><span class="keyword">end</span>;</span><br><span class="line"><span class="operator">/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">sql</span> <span class="operator">&gt;&gt;</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> <span class="keyword">member</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-2-세션"><a href="#5-2-세션" class="headerlink" title="5.2 세션"></a>5.2 세션</h2><ul>
+<li>세션 : 데이터베이스 접속을 시작부터 종료까지의 기간</li>
+<li>읽기 일관성 (read consistency)<ul>
+<li>데이터베이스는 여러곳에서 동시에 접근하여 데이터를 관리 &amp; 접근하게하는 목적을 갖고 있다.</li>
+<li>데이터베이스에 여러 세션이 있는 상황에서 각각 다른 트랜잭션을 수행할 것이다.</li>
+<li>데이터 조작이 포함된 트랜잭션이 완료되기 전까지, 이전의 내용이 일관적으로 유지됨</li>
+</ul>
+</li>
+<li>LOCK : 수정중인 데이터 접근을 막는다.<ul>
+<li>row level lock : 트랜잭션 종료 전 까지 다른 세션에서 DML 못함 (인서트는 가능)</li>
+<li>table level lock : 트랜잭션 종료 전 까지 DDL 못함</li>
+</ul>
+</li>
+</ul>
+<h1 id="6-서브프로그램"><a href="#6-서브프로그램" class="headerlink" title="6. 서브프로그램"></a>6. 서브프로그램</h1><ul>
+<li>PL&#x2F;SQL에는 2가지 유형의 서브프로그램이 있다.<ul>
+<li>프로시저</li>
+<li>함수</li>
+</ul>
+</li>
+</ul>
+<h2 id="6-1-함수"><a href="#6-1-함수" class="headerlink" title="6.1 함수"></a>6.1 함수</h2><ul>
+<li>IN 파라미터만 사용할 수 있다.</li>
+<li>함수는 주로 컬럼에 적용한다.<ul>
+<li>주로 ORACLE 내장함수, PL&#x2F;SQL 문법으로만 이뤄져있음</li>
+</ul>
+</li>
+<li>예외처리 시 return문 이후 기술</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">create [or replace] function 함수명 [(매개변수1 [in] 자료형, 매개변수2 [in] 자료형, ...)]</span><br><span class="line">	return 자료형</span><br><span class="line">is</span><br><span class="line">    -- 선언부 부턴 자료형에 자릿수 넣어도 됨</span><br><span class="line">    var_name 자료형;</span><br><span class="line">begin</span><br><span class="line">	...</span><br><span class="line">	return var_name;</span><br><span class="line">    EXCEPTION</span><br><span class="line">    WHEN exception명 THEN</span><br><span class="line">        statement</span><br><span class="line">    when others then</span><br><span class="line">    	statement</span><br><span class="line">end;</span><br><span class="line">/</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">sql &gt;&gt; ed function1</span><br><span class="line"></span><br><span class="line">create or replace function getTotal(snum number, fnum number)</span><br><span class="line">	return number</span><br><span class="line">is</span><br><span class="line">hap number(10); </span><br><span class="line">begin</span><br><span class="line">	hap := 0;</span><br><span class="line">	for k in snum .. fnum loop</span><br><span class="line">		hap := hap + k;</span><br><span class="line">	end loop;</span><br><span class="line">	return hap;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">sql &gt;&gt; @function1</span><br><span class="line">sql &gt;&gt; select gettotal(1, 10) from dual;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sql &gt;&gt; ed function2</span><br><span class="line"></span><br><span class="line">create or replace function to_aesterisk(name varchar2)</span><br><span class="line">	return varchar2</span><br><span class="line">is</span><br><span class="line">cryp_name varchar2(10); </span><br><span class="line">begin</span><br><span class="line">	cryp_name := rpad(substr(name, 1, 1), length(name), &#x27;*&#x27;);</span><br><span class="line">	return cryp_name;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">sql &gt;&gt; @function2</span><br><span class="line">sql &gt;&gt; select to_aesterisk(ename) from emp;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>select text from user_source where name &#x3D; ‘to_aesterisk’;</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">sql &gt;&gt; ed function3</span><br><span class="line"></span><br><span class="line">create or replace function date_to_str(date_type date)</span><br><span class="line">	return varchar2</span><br><span class="line">is</span><br><span class="line">string_type varchar2(10); </span><br><span class="line">begin</span><br><span class="line">	string_type := TO_CHAR(date_type, &#x27;yyyy-mm-dd&#x27;);</span><br><span class="line">	return string_type;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">sql &gt;&gt; @function3</span><br><span class="line">sql &gt;&gt; select date_to_str(sysdate) from dual;</span><br><span class="line">sql &gt;&gt; select date_to_str(hiredate) from emp;</span><br><span class="line">sql &gt;&gt; var rtval varchar2(10);</span><br><span class="line">sql &gt;&gt; EXECUTE :rtval := date_to_str(sysdate);</span><br><span class="line">sql &gt;&gt; print rtval;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">sql &gt;&gt; ed function4</span><br><span class="line"></span><br><span class="line">-- 예외처리 시 return문 이후 기술</span><br><span class="line">create or replace function exceptionFUnc(value nvarchar2)</span><br><span class="line">	return nvarchar2</span><br><span class="line">is</span><br><span class="line">	toNumber number;</span><br><span class="line">begin</span><br><span class="line">	select TO_NUMBER(value) into toNumber from dual;	</span><br><span class="line">	return toNumber;</span><br><span class="line">	exception</span><br><span class="line">	when others then</span><br><span class="line">		return &#x27;is not number&#x27;;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">sql &gt;&gt; @function4</span><br><span class="line">sql &gt;&gt; exceptionFUnc(1004)</span><br><span class="line">sql &gt;&gt; select exceptionFUnc(1004) from dual;</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-2-프로시저"><a href="#6-2-프로시저" class="headerlink" title="6.2 프로시저"></a>6.2 프로시저</h2><ul>
+<li>함수는 컬럼을 가공하기 위해 사용한다.</li>
+<li>이와 달리, 프로시저는 복잡한 처리의 sql을 다룰 때 사용한다.<ul>
+<li>그러다보니 <code>COMMIT</code> , <code>ROLLBACK </code>포함하게 됨</li>
+</ul>
+</li>
+<li>리턴문이 없고 매개변수 주소에 값을 넣는 구조이다.</li>
+<li>저장 프로시져(STORED PROCEDURE)의 장점<ul>
+<li><p>좋은 성능 : sql 쿼리를 매번 파싱할 필요가 없다.</p>
+</li>
+<li><p>보안성 : sql 쿼리 통신이 없기 때문</p>
+</li>
+<li><p>다양한 처리 : 조건 1일때는 insert, 조건 2일때는 update, …</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">CREATE [OR REPLACE] PROCEDURE 프로시저명</span><br><span class="line">[(</span><br><span class="line">    매개변수 [IN] 자료형,//크기 지정 안함</span><br><span class="line">    매개변수 OUT 자료형,//출력용</span><br><span class="line">)]</span><br><span class="line">IS</span><br><span class="line">	[변수선언]</span><br><span class="line">BEGIN</span><br><span class="line">	........</span><br><span class="line">END;</span><br><span class="line"></span><br><span class="line">--실행방법</span><br><span class="line">sql &gt;&gt; EXECUTE 프로시저명[(인수1,인수2,..)]</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p>매개변수의 자료형 지정시 해당 테이블의 컬럼과 같은 자료형으로 지정하고 싶을 때</p>
+<blockquote>
+<p><strong>테이블명.컬럼명%TYPE</strong></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">sql &gt;&gt; ed proc_insert_member</span><br><span class="line"></span><br><span class="line">create or replace procedure sp_ins_member</span><br><span class="line">(</span><br><span class="line">	v_username in member.username%type,</span><br><span class="line">	v_password member.password%type,</span><br><span class="line">	v_name member.name%type,</span><br><span class="line">	rtval out nvarchar2</span><br><span class="line">)</span><br><span class="line">is</span><br><span class="line">begin</span><br><span class="line">	insert into member(username, password, name)</span><br><span class="line">	values(v_username, v_password, v_name);</span><br><span class="line"></span><br><span class="line">	if sql%found then</span><br><span class="line">		rtval := &#x27;input success&#x27;;</span><br><span class="line">		commit;</span><br><span class="line">	end if;</span><br><span class="line"></span><br><span class="line">	exception</span><br><span class="line">	when others then</span><br><span class="line">		rollback;</span><br><span class="line">		rtval := &#x27;failed : repeated pk || too long&#x27;;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">sql &gt;&gt; @proc_insert_member</span><br><span class="line">sql &gt;&gt; var rtval nvarchar2(40);</span><br><span class="line">sql &gt;&gt; execute sp_ins_member(&#x27;park&#x27;, &#x27;1234&#x27;, &#x27;박길동&#x27;, :rtval);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">sql &gt;&gt; ed proc_update_member</span><br><span class="line"></span><br><span class="line">create or replace procedure sp_udt_member</span><br><span class="line">(</span><br><span class="line">	v_username in member.username%type,</span><br><span class="line">	v_password member.password%type,</span><br><span class="line">	v_name member.name%type,</span><br><span class="line">	rtval out nchar</span><br><span class="line">)</span><br><span class="line">is</span><br><span class="line">begin</span><br><span class="line">	update member set password = v_password, name = v_name</span><br><span class="line">	where username = v_username;</span><br><span class="line"></span><br><span class="line">	if sql%found then</span><br><span class="line">		rtval := &#x27;input success&#x27;;</span><br><span class="line">		commit;</span><br><span class="line">	else -- non exist username</span><br><span class="line">		rtval := &#x27;not found username : &#x27; || v_username;</span><br><span class="line">	end if;</span><br><span class="line"></span><br><span class="line">	exception</span><br><span class="line">	when others then</span><br><span class="line">		rollback;</span><br><span class="line">		rtval := &#x27;failed : too long&#x27;;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">sql &gt;&gt; @proc_update_member</span><br><span class="line">sql &gt;&gt; var rtval nchar(40);</span><br><span class="line">sql &gt;&gt; exec sp_udt_member(&#x27;park&#x27;, &#x27;8888&#x27;, &#x27;박길22&#x27;, :rtval);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">sql &gt;&gt; ed proc_del_member</span><br><span class="line"></span><br><span class="line">create or replace procedure sp_del_member</span><br><span class="line">(</span><br><span class="line">	v_username in member.username%type,</span><br><span class="line">	affected out number</span><br><span class="line">)</span><br><span class="line">is</span><br><span class="line">begin</span><br><span class="line">	delete member where username = v_username;</span><br><span class="line"></span><br><span class="line">	if sql%found then</span><br><span class="line">		dbms_output.put_line(v_username || &#x27;has been deleted&#x27;);</span><br><span class="line">		affected := sql%rowcount;</span><br><span class="line">		commit;</span><br><span class="line">	else -- non exist username</span><br><span class="line">		dbms_output.put_line(&#x27;not found username : &#x27; || v_username);</span><br><span class="line">		affected := sql%rowcount;</span><br><span class="line">	end if;</span><br><span class="line"></span><br><span class="line">	exception</span><br><span class="line">	when others then</span><br><span class="line">		rollback;</span><br><span class="line">		dbms_output.put_line(&#x27;referenced by children&#x27;);</span><br><span class="line">		affected := -1;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">sql &gt;&gt; @proc_del_member</span><br><span class="line">sql &gt;&gt; var affected number;</span><br><span class="line">sql &gt;&gt; exec sp_del_member(&#x27;park&#x27;, :affected);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">create sequence seq_bbs</span><br><span class="line">    nocache</span><br><span class="line">    nocycle;</span><br><span class="line"></span><br><span class="line">insert into bbs(no, username, title) values(seq_bbs.nextval, &#x27;leezz&#x27;, &#x27;title1&#x27;);</span><br><span class="line">commit;</span><br><span class="line">exec sp_del_member(&#x27;leezz&#x27;, :affected);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">sql &gt;&gt; ed is_member</span><br><span class="line"></span><br><span class="line">create or replace procedure sp_ismember</span><br><span class="line">(</span><br><span class="line">	v_username member.username%type,</span><br><span class="line">	v_password member.password%type,</span><br><span class="line">	rtval out number</span><br><span class="line">)</span><br><span class="line">is</span><br><span class="line">	flag number(1);</span><br><span class="line">begin</span><br><span class="line">	select count(*) into flag from member</span><br><span class="line">	where username = v_username;</span><br><span class="line">	if flag = 0 then -- non exist such id</span><br><span class="line">		rtval := -1;</span><br><span class="line">	else</span><br><span class="line">        select count(*) into flag from member</span><br><span class="line">        where username = v_username and password = v_password;</span><br><span class="line">        if flag = 0 then -- wrong pwd</span><br><span class="line">        	rtval := 0;</span><br><span class="line">        else</span><br><span class="line">        	rtval := 1;</span><br><span class="line">        end if;</span><br><span class="line">	end if;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">sql &gt;&gt; var rtval number;</span><br><span class="line">sql &gt;&gt; exec sp_ismember(&#x27;leezz&#x27;, &#x27;1234&#x27;, :rtval);</span><br><span class="line">sql &gt;&gt; print :rtval;</span><br></pre></td></tr></table></figure>
+
+<h1 id="7-트리거"><a href="#7-트리거" class="headerlink" title="7. 트리거"></a>7. 트리거</h1><ul>
+<li>INSERT, UPDATE, DELETE문이 TABLE에 대해 행해질 때 묵시적으로 수행되는 프로시저</li>
+<li>직접(execute) 실행불가</li>
+<li>하나의 테이블에 최대 3개까지 트리거 적용가능</li>
+<li>단, 트리거 많을 수록 성능저하 초래 가능성 있다.</li>
+<li>트리거 몸체(PL&#x2F;SQL블락)안에는 <code>COMMIT;</code> <code>ROLLBACK;</code>불가</li>
+<li><code>:NEW(변경후)</code> ,<code>:OLD(변경전)</code> 임시테이블은 행단위 트리거에서만 사용가능<ul>
+<li><code>INSERT</code><ul>
+<li><code>:OLD</code> &#x3D; NULL</li>
+<li><code>:NEW</code> &#x3D; 새로운 입력값</li>
+</ul>
+</li>
+<li><code>UPDATE</code><ul>
+<li><code>:OLD</code> &#x3D; 업데이트 전의 값</li>
+<li><code>:NEW</code> &#x3D; 새로운 변경값</li>
+</ul>
+</li>
+<li><code>DELETE</code><ul>
+<li><code>:OLD</code> &#x3D; 삭제 전의 값</li>
+<li><code>:NEW</code> &#x3D; NULL</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>보통 행단위 트리거를 쓰고 문장단위 트리거는 쓸 일이 없다.</li>
+</ul>
+<h2 id="7-1-트리거의-분류"><a href="#7-1-트리거의-분류" class="headerlink" title="7.1 트리거의 분류"></a>7.1 트리거의 분류</h2><ol>
+<li>트리거몸체(DECLARE~ BEGIN END;절)의 실행 횟수에 따른 분류<ul>
+<li>문장단위 트리거 : 한번만 실행</li>
+<li>행단위 트리거 : 행단위로 변경된 횟수만큼 실행됨</li>
+</ul>
+</li>
+<li>타이밍에 따른 분류<ul>
+<li>BEFORE트리거<ul>
+<li>이벤트(I&#x2F;D&#x2F;U)발생전 트리거몸체 실행된다.</li>
+<li>판매 테이블에 insert를 하기 전에, 재고 테이블을 확인하도록 BEFORE 트리거를 작성한다.</li>
+<li><code>RAISE_APPLICATION_ERROR(에러번호,&#39;에러메시지&#39;);</code><ul>
+<li>에러번호는 -20000 ~-20999사이의 임의의 숫자 지정</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>AFTER트리거<ul>
+<li>입고 테이블에 insert를 하면, 재고 테이블에 insert&#x2F;update를 하도록 AFTER 트리거를 작성한다.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="7-2-트리거-만들기"><a href="#7-2-트리거-만들기" class="headerlink" title="7.2 트리거 만들기"></a>7.2 트리거 만들기</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">-- 생성</span><br><span class="line">CREATE TRIGGER 트리거명</span><br><span class="line">	타이밍 [BEFORE|AFTER] 이벤트 [INSERT [OR] | UPDATE [OR] DELETE]</span><br><span class="line">	ON 트리거를 걸 테이블명</span><br><span class="line">	[FOR EACH ROW] --생략시 문장단위 트리거</span><br><span class="line">	[WHEN 트리거 조건] -- 거의 안씀</span><br><span class="line">DECALRE</span><br><span class="line">	변수 선언</span><br><span class="line">BEGIN</span><br><span class="line">	트리거 내용</span><br><span class="line">END;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">-- 삭제</span><br><span class="line">DROP TRIGGER 트리거명</span><br><span class="line"></span><br><span class="line">-- 변경</span><br><span class="line">ALTER TRIGGER 트리거명 [ENABLE/DISABLE]</span><br><span class="line">ALTER TABLE 테이블명  ENABLE/DISABLE  ALL TRIGGERS</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> const_user IDENTIFIED <span class="keyword">BY</span> const_user;</span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">connect</span>, resource <span class="keyword">TO</span> const_user;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 트리거를 걸 테이블</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> trigger_tbl(</span><br><span class="line">	<span class="keyword">no</span> number <span class="keyword">primary</span> key,</span><br><span class="line">	message nvarchar2(<span class="number">10</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 위 테이블에 행이 입력수정삭제되면 자동으로 어떤 이벤트가 발생했는 지 입력하자</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> target_tbl(</span><br><span class="line">	event nvarchar2(<span class="number">10</span>),</span><br><span class="line">	postdate <span class="type">date</span> <span class="keyword">default</span> sysdate</span><br><span class="line">);</span><br><span class="line"><span class="keyword">drop</span> <span class="keyword">trigger</span> trg_trigger_tbl;</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">trigger</span> trg_after_tbl</span><br><span class="line">	after <span class="keyword">insert</span> <span class="keyword">or</span> <span class="keyword">update</span> <span class="keyword">or</span> <span class="keyword">delete</span></span><br><span class="line">	<span class="keyword">on</span> trigger_tbl <span class="comment">-- 트리거를 걸 테이블명</span></span><br><span class="line">	<span class="keyword">for</span> <span class="keyword">each</span> <span class="type">row</span> <span class="comment">-- 행단위 트리거</span></span><br><span class="line"><span class="keyword">declare</span></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">	if INSERTING <span class="keyword">then</span> <span class="comment">-- trigger_tbl에 인서트가 발생하면</span></span><br><span class="line">		<span class="keyword">insert</span> <span class="keyword">into</span> target_tbl(event) <span class="keyword">values</span>(<span class="string">&#x27;insert&#x27;</span>);</span><br><span class="line">    elsif DELETING <span class="keyword">then</span></span><br><span class="line">    	<span class="keyword">insert</span> <span class="keyword">into</span> target_tbl <span class="keyword">values</span>(<span class="string">&#x27;delete&#x27;</span>, <span class="keyword">DEFAULT</span>);</span><br><span class="line">    elsif UPDATING <span class="keyword">then</span></span><br><span class="line">    	<span class="keyword">insert</span> <span class="keyword">into</span> target_tbl <span class="keyword">values</span>(<span class="string">&#x27;update&#x27;</span>, <span class="keyword">DEFAULT</span>);</span><br><span class="line">    <span class="keyword">end</span> if;</span><br><span class="line"><span class="keyword">end</span>;</span><br><span class="line"><span class="operator">/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> trigger_tbl <span class="keyword">values</span>(<span class="number">1</span>, <span class="string">&#x27;insert!!!!&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> trigger_tbl <span class="keyword">values</span>(<span class="number">2</span>, <span class="string">&#x27;insert!!!!&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> trigger_tbl <span class="keyword">values</span>(<span class="number">3</span>, <span class="string">&#x27;insert!!!!&#x27;</span>);</span><br><span class="line"><span class="keyword">update</span> trigger_tbl <span class="keyword">set</span> message <span class="operator">=</span> <span class="string">&#x27;insert!&#x27;</span> <span class="keyword">where</span> <span class="keyword">no</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"><span class="keyword">delete</span> trigger_tbl;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> target_tbl;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">-- 특정 조건에 따라 인서트 이벤트 발생 시 행 입력 혹은 예외를 던지자</span><br><span class="line">create trigger trg_before_tbl</span><br><span class="line">	before insert</span><br><span class="line">	on trigger_tbl -- 트리거를 걸 테이블명</span><br><span class="line">	for each row -- 행단위 트리거</span><br><span class="line">declare</span><br><span class="line">begin</span><br><span class="line">	--if to_char(sysdate, &#x27;DY&#x27;) = &#x27;금&#x27; or to_char(sysdate, &#x27;HH24&#x27;) &gt;= 12 then</span><br><span class="line">		--raise_application_error(-20001, &#x27;friday | afternoon =&gt; XXXXXXX&#x27;);</span><br><span class="line">	if to_char(sysdate, &#x27;DY&#x27;) = &#x27;목&#x27; or to_char(sysdate, &#x27;HH24&#x27;) &lt; 12 then</span><br><span class="line">		raise_application_error(-20001, &#x27;Thur | beforenoon =&gt; XXXXXXX&#x27;);</span><br><span class="line">	else</span><br><span class="line">		insert into target_tbl values(&#x27;sucess&#x27;, DEFAULT);</span><br><span class="line">    end if;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">insert into trigger_tbl values(1, &#x27;inser!!&#x27;);</span><br><span class="line">select * from target_tbl;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line">--재고</span><br><span class="line">CREATE TABLE PRODUCT(</span><br><span class="line">    P_CODE CHAR(4) PRIMARY KEY,</span><br><span class="line">    P_NAME NVARCHAR2(10) NOT NULL,</span><br><span class="line">    P_PRICE NUMBER,</span><br><span class="line">    P_QTY NUMBER DEFAULT 0);</span><br><span class="line">--입고</span><br><span class="line">CREATE TABLE INP(</span><br><span class="line">    I_NO NUMBER PRIMARY KEY,</span><br><span class="line">    P_CODE CHAR(4) REFERENCES PRODUCT(P_CODE),</span><br><span class="line">    I_DATE DATE DEFAULT SYSDATE,</span><br><span class="line">    I_QTY NUMBER,</span><br><span class="line">    I_PRICE NUMBER</span><br><span class="line">);</span><br><span class="line">--판매</span><br><span class="line">CREATE TABLE SALES(</span><br><span class="line">    S_NO NUMBER PRIMARY KEY,</span><br><span class="line">    P_CODE CHAR(4) REFERENCES PRODUCT(P_CODE),</span><br><span class="line">    S_DATE DATE DEFAULT SYSDATE,</span><br><span class="line">    S_QTY NUMBER,</span><br><span class="line">    S_PRICE NUMBER</span><br><span class="line">);</span><br><span class="line">SELECT * FROM PRODUCT;</span><br><span class="line">SELECT * FROM INP;</span><br><span class="line">SELECT * FROM SALES;</span><br><span class="line"></span><br><span class="line">insert into product(p_code, p_name, p_price) values(&#x27;b001&#x27;, &#x27;JAVA&#x27;, 2500);</span><br><span class="line">insert into product(p_code, p_name, p_price) values(&#x27;b002&#x27;, &#x27;Spring&#x27;, 3000);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 입고량 인서트 시 재고량 추가</span><br><span class="line">create trigger trg_after_inp</span><br><span class="line">	after insert</span><br><span class="line">	on inp</span><br><span class="line">	for each row</span><br><span class="line">declare</span><br><span class="line">begin</span><br><span class="line">	update product set p_qty = p_qty + :NEW.i_qty</span><br><span class="line">    	where p_code = :NEW.p_code;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">insert into inp(i_no, p_code, i_qty, i_price) values(1, &#x27;b001&#x27;, 5, 2000);</span><br><span class="line">insert into inp(i_no, p_code, i_qty, i_price) values(2, &#x27;b001&#x27;, 15, 1800);</span><br><span class="line"></span><br><span class="line">SELECT * FROM PRODUCT;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 입고량 수정 시 재고량 수정</span><br><span class="line">create trigger trg_after_update_inp</span><br><span class="line">	after update</span><br><span class="line">	on inp</span><br><span class="line">	for each row</span><br><span class="line">declare</span><br><span class="line">begin</span><br><span class="line">	update product set p_qty = p_qty - :OLD.i_qty + :NEW.i_qty</span><br><span class="line">    	where p_code = :NEW.p_code;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line">update inp set i_qty = 5 where i_no = 2;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">--판매 테이블에 insert 트리거를 걸자</span><br><span class="line">-- 재고수량이 판매수량보다 적으면 판매불가</span><br><span class="line">create trigger trg_before_insert_sales</span><br><span class="line">before insert</span><br><span class="line">on sales</span><br><span class="line">for each row</span><br><span class="line">declare</span><br><span class="line">	qty number;</span><br><span class="line">begin</span><br><span class="line">	select p_qty into qty from product where p_code = :NEW.p_code;</span><br><span class="line">	if qty &lt;:NEW.s_qty then</span><br><span class="line">		raise_application_error(-20002, &#x27;out of stock&#x27;);</span><br><span class="line">	else</span><br><span class="line">		update product set p_qty = p_qty - :NEW.s_qty where p_code = :NEW.p_code;</span><br><span class="line">	end if;</span><br><span class="line">end;</span><br><span class="line">/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">insert into sales(s_no, p_code, s_qty, s_price) values(1, &#x27;b001&#x27;, 100, 10000);</span><br><span class="line">insert into sales(s_no, p_code, s_qty, s_price) values(1, &#x27;b001&#x27;, 2, 10000);</span><br><span class="line">select * from product;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SQL/" rel="tag"># SQL</a>
+              <a href="/tags/PLSQL/" rel="tag"># PLSQL</a>
+              <a href="/tags/Transaction/" rel="tag"># Transaction</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/13/SQL/" rel="prev" title="SQL">
+      <i class="fa fa-chevron-left"></i> SQL
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/13/JDK-Basic/" rel="next" title="JDK Basic">
+      JDK Basic <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%EB%B3%80%EC%88%98%EC%84%A0%EC%96%B8-%EB%B0%8F-%ED%95%A0%EB%8B%B9"><span class="nav-text">1. 변수선언 및 할당</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%EA%B8%B0%EB%B3%B8%EB%AC%B8%EB%B2%95"><span class="nav-text">2. 기본문법</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%EC%97%B0%EC%82%B0%EC%9E%90"><span class="nav-text">2.1 연산자</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%EC%A0%9C%EC%96%B4"><span class="nav-text">2.2 제어</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-1-IF"><span class="nav-text">2.2.1 IF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2-FOR"><span class="nav-text">2.2.2 FOR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-3-WHILE"><span class="nav-text">2.2.3 WHILE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-4-LOOP"><span class="nav-text">2.2.4 LOOP</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%EC%BB%A4%EC%84%9C"><span class="nav-text">3. 커서</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-Parametric-cursor"><span class="nav-text">3.1 Parametric cursor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-Implicit-cursor"><span class="nav-text">3.2 Implicit cursor</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%EC%98%88%EC%99%B8"><span class="nav-text">4. 예외</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%EC%82%AC%EC%A0%84%EC%97%90-%EC%A0%95%EC%9D%98%EB%90%9C-%EC%98%88%EC%99%B8%EB%93%A4"><span class="nav-text">4.1 사전에 정의된 예외들</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC"><span class="nav-text">4.2 예외처리</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-Custom-Exception"><span class="nav-text">4.3 Custom Exception</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98"><span class="nav-text">5. 트랜잭션</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-%ED%8A%B8%EB%9E%9C%EC%9E%AD%EC%85%98-%EC%A0%9C%EC%96%B4-%EB%AA%85%EB%A0%B9%EC%96%B4-TCL"><span class="nav-text">5.1 트랜잭션 제어 명령어 (TCL)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-%EC%84%B8%EC%85%98"><span class="nav-text">5.2 세션</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%EC%84%9C%EB%B8%8C%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8"><span class="nav-text">6. 서브프로그램</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-%ED%95%A8%EC%88%98"><span class="nav-text">6.1 함수</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-%ED%94%84%EB%A1%9C%EC%8B%9C%EC%A0%80"><span class="nav-text">6.2 프로시저</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-%ED%8A%B8%EB%A6%AC%EA%B1%B0"><span class="nav-text">7. 트리거</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-%ED%8A%B8%EB%A6%AC%EA%B1%B0%EC%9D%98-%EB%B6%84%EB%A5%98"><span class="nav-text">7.1 트리거의 분류</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-2-%ED%8A%B8%EB%A6%AC%EA%B1%B0-%EB%A7%8C%EB%93%A4%EA%B8%B0"><span class="nav-text">7.2 트리거 만들기</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

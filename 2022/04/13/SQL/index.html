@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leequant7612.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="SQL : RDBMS의 데이터를 제어하기 위한 표준 질의어 NUMBER  BINARY_INTEGER : (4Byte:-2^31-1 ~ 2^31-1) NUMBER :  38자리의 정수,실수 NUMBER(n) : n자리의 정수 NUMBER(p,s) : p자리의 실수, 소수점은 s자리 (소수점이 길어지면 반올림 처리)  CHAR  CHAR(n) : n(&lt;2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SQL">
+<meta property="og:url" content="http://leequant7612.github.io/2022/04/13/SQL/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="SQL : RDBMS의 데이터를 제어하기 위한 표준 질의어 NUMBER  BINARY_INTEGER : (4Byte:-2^31-1 ~ 2^31-1) NUMBER :  38자리의 정수,실수 NUMBER(n) : n자리의 정수 NUMBER(p,s) : p자리의 실수, 소수점은 s자리 (소수점이 길어지면 반올림 처리)  CHAR  CHAR(n) : n(&lt;2">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-04-13T00:54:16.000Z">
+<meta property="article:modified_time" content="2022-04-13T00:58:43.162Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="SQL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://leequant7612.github.io/2022/04/13/SQL/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>SQL | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://leequant7612.github.io/2022/04/13/SQL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SQL
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-13 09:54:16 / Modified: 09:58:43" itemprop="dateCreated datePublished" datetime="2022-04-13T09:54:16+09:00">2022-04-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DB-SQL/" itemprop="url" rel="index"><span itemprop="name">DB/SQL</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>SQL : RDBMS의 데이터를 제어하기 위한 표준 질의어</p>
+<p><strong>NUMBER</strong></p>
+<ul>
+<li><code>BINARY_INTEGER</code> : (4Byte:-2^31-1 ~ 2^31-1)</li>
+<li><code>NUMBER</code> :  38자리의 정수,실수</li>
+<li><code>NUMBER(n)</code> : n자리의 정수</li>
+<li><code>NUMBER(p,s)</code> : p자리의 실수, 소수점은 s자리 (소수점이 길어지면 반올림 처리)</li>
+</ul>
+<p><strong>CHAR</strong></p>
+<ul>
+<li><code>CHAR(n)</code> : n(&lt;2000) 바이트 “고정” 문자열</li>
+<li><code>NCHAR(n)</code> : n(&lt;1000) 길이의 문자열</li>
+<li><code>VARCHAR2(n)</code> : 가변 길이의 문자열, 최대 n(&lt;4000) 바이트</li>
+<li><code>NVARCHAR2(n)</code> : 가변 길이의 문자열, 최대 n(&lt;2000) 길이</li>
+<li><code>LONG</code> : 가변 길이의 문자열, 최대 4GB</li>
+<li>…</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="1-DML"><a href="#1-DML" class="headerlink" title="1 DML"></a>1 DML</h1><p>**”테이블”**을 다루는 명령어들이다. Select(조회), Insert(삽입), Update(수정) Delete(삭제)</p>
+<h2 id="1-1-SELECT-DML"><a href="#1-1-SELECT-DML" class="headerlink" title="1.1 SELECT - DML"></a>1.1 SELECT - DML</h2><p>FROM -&gt; WHERE -&gt; GROUP BY -&gt; HAVING -&gt; SELECT -&gt; ORDER BY</p>
+<pre><code>SELECT 컬럼이름,컬럼이름,.....	  
+    FROM 테이블 이름
+        [WHERE 찾는 조건]
+            [GROUP BY 결과 데이터 그룹회]
+                [HAVING 그룹에서 찾는 조건]
+                    [ORDER BY 데이터 정렬 표현]
+</code></pre>
+<ul>
+<li>비교연산자<ul>
+<li>&#x3D; ,&gt; ,&gt;&#x3D;, &lt; , &lt;&#x3D;, !&#x3D;</li>
+</ul>
+</li>
+<li>논리연산자<ul>
+<li>AND, OR, NOT</li>
+</ul>
+</li>
+<li>SQL연산자<ul>
+<li>BETWEEN a AND b</li>
+<li>IN, NOT IN</li>
+<li>LIKE<ul>
+<li>% : 임의의 0개 이상의 문자열</li>
+<li>_  :  임의의 한 글자</li>
+<li>LIKE ‘A%’ : A, ABC, A123, …</li>
+<li>LIKE ‘%A’ :  A, BCA,123A, …   </li>
+<li>LIKE ‘%KIM%’ :  KIM, ABCKIM ,ABCKIMDEF,KIMABC, …</li>
+<li>LIKE ‘_A%’ : DA, AA, BACKCL, …</li>
+</ul>
+</li>
+<li>IS NULL, IS NOT NULL</li>
+</ul>
+</li>
+</ul>
+<p>예시코드 (scott 계정 로그인)</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp;</span><br><span class="line"><span class="keyword">select</span> ename, sal <span class="keyword">from</span> emp;</span><br><span class="line"><span class="keyword">select</span> ename, sal, sal<span class="operator">*</span><span class="number">1.5</span> <span class="keyword">from</span> emp;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- AS : 출력 시 열 이름 변경 </span></span><br><span class="line"><span class="keyword">select</span> ename, sal, sal<span class="operator">*</span><span class="number">1.5</span> <span class="keyword">as</span> 인상연봉 <span class="keyword">from</span> emp;</span><br><span class="line"><span class="keyword">select</span> ename, sal <span class="keyword">as</span> 연봉, sal<span class="operator">*</span><span class="number">1.5</span> <span class="keyword">as</span> 인상연봉 <span class="keyword">from</span> emp;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- DISTINCT : 중복 제거</span></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">distinct</span> job <span class="keyword">from</span> emp;</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">distinct</span> job, deptno <span class="keyword">from</span> emp;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- WHERE : 필터</span></span><br><span class="line"><span class="keyword">select</span> ename, sal, job <span class="keyword">from</span> emp <span class="keyword">where</span> sal <span class="operator">&gt;=</span> <span class="number">3000</span>;</span><br><span class="line"><span class="keyword">select</span> ename, sal, job <span class="keyword">from</span> emp <span class="keyword">where</span> job <span class="operator">=</span> <span class="string">&#x27;SALESMAN&#x27;</span>;</span><br><span class="line"><span class="keyword">select</span> ename, sal, job <span class="keyword">from</span> emp <span class="keyword">where</span> job <span class="operator">=</span> <span class="string">&#x27;SALESMAN&#x27;</span> <span class="keyword">AND</span>  sal <span class="operator">&gt;=</span> <span class="number">1500</span>;</span><br><span class="line"><span class="keyword">select</span> ename, sal, job <span class="keyword">from</span> emp <span class="keyword">where</span> job <span class="operator">!=</span> <span class="string">&#x27;SALESMAN&#x27;</span>;</span><br><span class="line"><span class="keyword">select</span> ename, sal, job <span class="keyword">from</span> emp <span class="keyword">where</span> <span class="keyword">NOT</span> job <span class="operator">=</span> <span class="string">&#x27;SALESMAN&#x27;</span>;</span><br><span class="line"><span class="keyword">select</span> ename, sal, job <span class="keyword">from</span> emp <span class="keyword">where</span> sal <span class="keyword">BETWEEN</span> <span class="number">1000</span> <span class="keyword">AND</span> <span class="number">1500</span>;</span><br><span class="line"><span class="keyword">select</span> ename, sal, job <span class="keyword">from</span> emp <span class="keyword">where</span> job <span class="keyword">IN</span> (<span class="string">&#x27;CLERK&#x27;</span>, <span class="string">&#x27;MANAGER&#x27;</span>);</span><br><span class="line"><span class="keyword">select</span> ename, sal, job <span class="keyword">from</span> emp <span class="keyword">where</span> job <span class="keyword">NOT</span> <span class="keyword">IN</span> (<span class="string">&#x27;CLERK&#x27;</span>, <span class="string">&#x27;MANAGER&#x27;</span>);</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">where</span> ename <span class="keyword">LIKE</span> <span class="string">&#x27;%R&#x27;</span>;</span><br><span class="line"><span class="keyword">select</span> ename, sal, job <span class="keyword">from</span> emp <span class="keyword">where</span> comm <span class="keyword">IS</span> <span class="keyword">NULL</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">where</span> mgr <span class="keyword">is</span> <span class="keyword">NULL</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- ORDER BY</span></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">order</span> <span class="keyword">by</span> sal;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">order</span> <span class="keyword">by</span> sal <span class="keyword">DESC</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">order</span> <span class="keyword">by</span> job, deptno;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">order</span> <span class="keyword">by</span> job <span class="keyword">DESC</span>, deptno <span class="keyword">DESC</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- GROUP function : 그룹을 한개의 숫자로 요약</span></span><br><span class="line"><span class="keyword">select</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> emp;</span><br><span class="line"><span class="keyword">select</span> <span class="built_in">avg</span>(sal) <span class="keyword">from</span> emp;</span><br><span class="line"><span class="keyword">select</span> <span class="built_in">max</span>(sal) <span class="keyword">from</span> emp;</span><br><span class="line"><span class="keyword">select</span> <span class="built_in">min</span>(sal) <span class="keyword">from</span> emp;</span><br><span class="line"><span class="keyword">select</span> <span class="built_in">sum</span>(sal) <span class="keyword">from</span> emp;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- GROUP BY : 그룹핑</span></span><br><span class="line"><span class="keyword">select</span> deptno, <span class="built_in">MAX</span>(sal) <span class="keyword">FROM</span> emp <span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno;</span><br><span class="line"><span class="keyword">select</span> deptno, job, <span class="built_in">MAX</span>(sal) <span class="keyword">FROM</span> emp <span class="keyword">GROUP</span> <span class="keyword">BY</span> deptno, job;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- HAVING : 그룹 필터</span></span><br><span class="line"><span class="keyword">select</span> job, <span class="built_in">max</span>(sal) <span class="keyword">from</span> emp</span><br><span class="line">	<span class="keyword">where</span> sal <span class="operator">&gt;=</span> <span class="number">1000</span></span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span> job;</span><br><span class="line"><span class="keyword">select</span> job, <span class="built_in">max</span>(sal) <span class="keyword">from</span> emp</span><br><span class="line">	<span class="keyword">where</span> sal <span class="operator">&gt;=</span> <span class="number">1000</span></span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span> job <span class="keyword">HAVING</span> <span class="built_in">min</span>(sal) <span class="operator">&gt;=</span> <span class="number">1500</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- || : 문자열 연결, 파이프라인</span></span><br><span class="line"><span class="keyword">select</span> ename <span class="operator">||</span> <span class="string">&#x27;의 연봉은&#x27;</span> <span class="operator">||</span> sal <span class="operator">||</span> <span class="string">&#x27;입니다&#x27;</span> <span class="keyword">from</span> emp;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- SUBQUERY</span></span><br><span class="line"><span class="keyword">select</span> deptno, sal, ename <span class="keyword">from</span> emp </span><br><span class="line">	<span class="keyword">where</span> (deptno, sal) <span class="keyword">in</span> </span><br><span class="line">		((<span class="number">30</span>, <span class="number">2850</span>), (<span class="number">20</span>, <span class="number">3000</span>), (<span class="number">10</span>, <span class="number">5000</span>));</span><br><span class="line"><span class="keyword">select</span> deptno, sal, ename <span class="keyword">from</span> emp</span><br><span class="line">	<span class="keyword">where</span> (deptno, sal) <span class="keyword">in</span> </span><br><span class="line">		(<span class="keyword">select</span> deptno, <span class="built_in">max</span>(sal) <span class="keyword">from</span> emp <span class="keyword">group</span> <span class="keyword">by</span> deptno);</span><br><span class="line"><span class="keyword">select</span> ename, sal, deptno, hiredate <span class="keyword">from</span> emp</span><br><span class="line">	<span class="keyword">where</span> sal <span class="operator">&lt;</span> (<span class="keyword">select</span> <span class="built_in">avg</span>(sal) <span class="keyword">from</span> emp);</span><br><span class="line"><span class="keyword">select</span> dname <span class="keyword">from</span> dept</span><br><span class="line">	<span class="keyword">where</span> deptno <span class="keyword">not</span> <span class="keyword">in</span></span><br><span class="line">		(<span class="keyword">select</span> <span class="keyword">distinct</span> deptno <span class="keyword">from</span> emp); <span class="comment">-- 인력충원이 필요한 부서</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="1-1-1-JOIN"><a href="#1-1-1-JOIN" class="headerlink" title="1.1.1 JOIN"></a>1.1.1 JOIN</h3><p>두개 이상의 테이블로부터 자료를 검색하기 위해 사용한다.</p>
+<h4 id="INNER-JOIN"><a href="#INNER-JOIN" class="headerlink" title="INNER JOIN"></a>INNER JOIN</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">SELECT 컬럼이름,컬럼이름,.....</span><br><span class="line">	FROM 자식테이블</span><br><span class="line">		INNER JOIN 부모테이블</span><br><span class="line">			ON 자식테이블.ForeignKey = 부모테이블.PrimaryKey;</span><br><span class="line"></span><br><span class="line">// 여러개 조인</span><br><span class="line">SELECT 컬럼이름,컬럼이름,.....</span><br><span class="line">	FROM 테이블1 INNER JOIN 테이블2 ON 테이블1.ForeignKey = 테이블2.PrimaryKey</span><br><span class="line">		INNER JOIN 테이블3 ON 테이블2(혹은1).FK = 테이블3.PK</span><br><span class="line">			INNER JOIN 테이블4 ON 테이블3(혹은12).FK = 테이블4.PK;</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> ename, sal, dept.dname</span><br><span class="line">	<span class="keyword">from</span> emp <span class="keyword">inner</span> <span class="keyword">join</span> dept <span class="keyword">on</span> emp.deptno <span class="operator">=</span> dept.deptno;</span><br><span class="line"><span class="keyword">select</span> ename, sal, d.dname</span><br><span class="line">	<span class="keyword">from</span> emp e <span class="keyword">inner</span> <span class="keyword">join</span> dept d <span class="keyword">on</span> e.deptno <span class="operator">=</span> d.deptno;</span><br><span class="line"><span class="keyword">select</span> ename, sal, E.deptno, hiredate, D.dname</span><br><span class="line">	<span class="keyword">from</span> emp E <span class="keyword">join</span> dept D <span class="keyword">ON</span> E.DEPTNO <span class="operator">=</span> D.DEPTNO </span><br><span class="line">    <span class="keyword">where</span> (E.deptno, E.sal) <span class="keyword">in</span> </span><br><span class="line">    	(<span class="keyword">select</span> deptno, <span class="built_in">max</span>(sal) <span class="keyword">from</span> emp <span class="keyword">group</span> <span class="keyword">by</span> deptno)</span><br><span class="line"><span class="keyword">select</span> LAST_NAME <span class="operator">||</span> <span class="string">&#x27; &#x27;</span> <span class="operator">||</span> FIRST_NAME, salary, d.DEPARTMENT_NAME, l.city</span><br><span class="line">	<span class="keyword">from</span> employees e</span><br><span class="line">	<span class="keyword">inner</span> <span class="keyword">join</span> departments d <span class="keyword">on</span> e.DEPARTMENT_ID <span class="operator">=</span> d.DEPARTMENT_ID</span><br><span class="line">	<span class="keyword">inner</span> <span class="keyword">join</span> locations l <span class="keyword">on</span> d.location_id <span class="operator">=</span> l.location_id;</span><br><span class="line"><span class="keyword">select</span> LAST_NAME <span class="operator">||</span> <span class="string">&#x27; &#x27;</span> <span class="operator">||</span> FIRST_NAME, salary, d.DEPARTMENT_NAME, l.city, c.COUNTRY_NAME</span><br><span class="line">	<span class="keyword">from</span> employees e</span><br><span class="line">	<span class="keyword">inner</span> <span class="keyword">join</span> departments d <span class="keyword">on</span> e.DEPARTMENT_ID <span class="operator">=</span> d.DEPARTMENT_ID</span><br><span class="line">	<span class="keyword">inner</span> <span class="keyword">join</span> locations l <span class="keyword">on</span> d.location_id <span class="operator">=</span> l.location_id</span><br><span class="line">	<span class="keyword">inner</span> <span class="keyword">join</span> countries c <span class="keyword">on</span> c.COUNTRY_ID <span class="operator">=</span> l.COUNTRY_ID;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> employees</span><br></pre></td></tr></table></figure>
+
+<h4 id="OUTER-JOIN"><a href="#OUTER-JOIN" class="headerlink" title="OUTER JOIN"></a>OUTER JOIN</h4><ul>
+<li>최소 기준테이블의 행은 보장한다.</li>
+<li>부모 기준으로 하자. (이제 그냥 기준테이블 &#x3D; 부모라고 상정함)<ul>
+<li>잘 생각해보면 자식 기준으로 하면 inner join과 똑같다.</li>
+<li>왜냐면, 자식.FK에는 부모에게 있는 값만 쓸 수 있기 때문이다.</li>
+</ul>
+</li>
+<li>공통 칼럼도 부모 기준으로 select하자.</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SELECT 공통컬럼이름,공통컬럼이름,.....</span><br><span class="line">	FROM 부모테이블 LEFT OUTER JOIN 자식테이블</span><br><span class="line">		ON 자식테이블.ForeignKey = 부모테이블.PrimaryKey;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>로우 수<ul>
+<li>자식테이블 로우 수 + 참조가 안된 부모테이블 PK 수<ul>
+<li>부모테이블의 모든 행은 보존된다.</li>
+<li>자식테이블에서 특정 키를 n번 참조하면 n회가 나오는 구조</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> d.department_id, d.department_name</span><br><span class="line">	<span class="keyword">from</span> departments d <span class="keyword">left</span> <span class="keyword">outer</span> <span class="keyword">join</span> employees e</span><br><span class="line">	<span class="keyword">on</span> e.department_id <span class="operator">=</span> d.department_id</span><br><span class="line">    <span class="keyword">where</span> e.employee_id <span class="keyword">is</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="SELF-JOIN"><a href="#SELF-JOIN" class="headerlink" title="SELF JOIN"></a>SELF JOIN</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--셀프조인으로 매니저 이름 추가하기</span></span><br><span class="line"><span class="keyword">select</span> e1.ename, e2.ename </span><br><span class="line">	<span class="keyword">from</span> emp e1 <span class="keyword">join</span> emp e2 <span class="keyword">on</span> e1.mgr <span class="operator">=</span> e2.empno;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-1-2-TOP-Query"><a href="#1-1-2-TOP-Query" class="headerlink" title="1.1.2 TOP Query"></a>1.1.2 TOP Query</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--format 1</span></span><br><span class="line"><span class="comment">--일단 오더를 하고, 필터</span></span><br><span class="line"><span class="keyword">select</span> T.<span class="operator">*</span>, ROWNUM <span class="keyword">from</span></span><br><span class="line">	(<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">order</span> <span class="keyword">by</span> sal) T</span><br><span class="line">	<span class="keyword">where</span> ROWNUM <span class="operator">&lt;=</span> <span class="number">3</span>;</span><br><span class="line"><span class="keyword">select</span> T.<span class="operator">*</span>, ROWNUM</span><br><span class="line">	<span class="keyword">from</span> (<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">order</span> <span class="keyword">by</span> sal) T</span><br><span class="line">		<span class="keyword">where</span> ROWNUM <span class="keyword">between</span> <span class="number">11</span> <span class="keyword">and</span> <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">--format 2</span></span><br><span class="line"><span class="comment">--일단 오더를 하고, num 칼럼 추가하고, 필터</span></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span></span><br><span class="line">	(<span class="keyword">select</span> a.<span class="operator">*</span>, rownum num <span class="keyword">from</span></span><br><span class="line">    	(<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">order</span> <span class="keyword">by</span> sal) a</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">where</span> num <span class="keyword">between</span> <span class="number">5</span> <span class="keyword">and</span> <span class="number">8</span></span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span></span><br><span class="line">    (<span class="keyword">select</span> a.<span class="operator">*</span>, rownum num <span class="keyword">from</span></span><br><span class="line">        (<span class="keyword">select</span> E.<span class="operator">*</span>, D.dname </span><br><span class="line">        	<span class="keyword">from</span> emp E</span><br><span class="line">         	<span class="keyword">join</span> dept D <span class="keyword">on</span> E.deptno <span class="operator">=</span> D.deptno</span><br><span class="line">        	<span class="keyword">where</span> E.deptno<span class="operator">=</span><span class="number">30</span> <span class="keyword">order</span> <span class="keyword">by</span> sal <span class="keyword">desc</span></span><br><span class="line">        ) a</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">where</span> num <span class="keyword">between</span> <span class="number">1</span> <span class="keyword">and</span> <span class="number">3</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span></span><br><span class="line">	(<span class="keyword">select</span> a.<span class="operator">*</span>, rownum num <span class="keyword">from</span></span><br><span class="line">    	(<span class="keyword">select</span> E.<span class="operator">*</span>, L.city </span><br><span class="line">            <span class="keyword">from</span> employees E </span><br><span class="line">         	<span class="keyword">join</span> departments D <span class="keyword">on</span> E.department_id <span class="operator">=</span> D.department_id</span><br><span class="line">            <span class="keyword">join</span> locations L <span class="keyword">on</span> L.location_id <span class="operator">=</span> D.location_id</span><br><span class="line">			<span class="keyword">order</span> <span class="keyword">by</span> hire_date <span class="keyword">desc</span></span><br><span class="line">		) a</span><br><span class="line">	)</span><br><span class="line">	<span class="keyword">where</span> num <span class="keyword">between</span> <span class="number">1</span> <span class="keyword">and</span> <span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="1-2-Insert-DML"><a href="#1-2-Insert-DML" class="headerlink" title="1.2 Insert - DML"></a>1.2 Insert - DML</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span></span><br><span class="line">	테이블명(컬럼명<span class="number">2</span>,컬러명<span class="number">3</span>,<span class="comment">---------,컬러명1)</span></span><br><span class="line">	<span class="keyword">VALUES</span>(값<span class="number">2</span>,값<span class="number">3</span>,<span class="comment">---------------,값1)</span></span><br><span class="line">	</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span></span><br><span class="line">	테이블명</span><br><span class="line">	<span class="keyword">VALUES</span>(값<span class="number">1</span>,값<span class="number">2</span>,<span class="comment">---------------,값N)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="1-3-Update-DML"><a href="#1-3-Update-DML" class="headerlink" title="1.3 Update - DML"></a>1.3 Update - DML</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> 기존테이블명</span><br><span class="line">	<span class="keyword">SET</span> 컬럼명 <span class="operator">=</span> 새로운값</span><br><span class="line">	[<span class="keyword">WHERE</span> 업데이트 조건] <span class="comment">-- 그냥 필수임, 안하면 모든 행이 다 바뀜</span></span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> board <span class="keyword">set</span> title <span class="operator">=</span> <span class="string">&#x27;수정&#x27;</span> <span class="keyword">where</span> <span class="keyword">NO</span><span class="operator">=</span><span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-4-Delete-DML"><a href="#1-4-Delete-DML" class="headerlink" title="1.4 Delete - DML"></a>1.4 Delete - DML</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> [<span class="keyword">FROM</span>] 기존테이블명</span><br><span class="line">	[<span class="keyword">WHERE</span> 삭제 조건] <span class="comment">-- 그냥 필수임</span></span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> board <span class="keyword">where</span> title <span class="operator">=</span> <span class="string">&#x27;수정&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-DDL-데이터-구조-정의"><a href="#2-DDL-데이터-구조-정의" class="headerlink" title="2 DDL - 데이터 구조 정의"></a>2 DDL - 데이터 구조 정의</h1><p>Create(생성), Alter(수정), Drop(삭제)</p>
+<ul>
+<li><strong>테이블 뿐만 아니라</strong></li>
+<li><strong>유저, 롤, 인덱스, 뷰, 시퀀스 등을 (재)정의 할 때 사용하는 명령어</strong>이다.</li>
+<li>추가로, 제약조건 삭제 시 Drop 쓴다.</li>
+</ul>
+<h2 id="2-1-CREATE-DDL"><a href="#2-1-CREATE-DDL" class="headerlink" title="2.1 CREATE - DDL"></a>2.1 CREATE - DDL</h2><p>테이블(및 다른 객체들)을 생성한다.</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span>  테이블명(</span><br><span class="line">	컬럼명<span class="number">1</span> 자료형<span class="number">1</span>,</span><br><span class="line">	컬럼명N 자료형N</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-1-1-Constraints"><a href="#2-1-1-Constraints" class="headerlink" title="2.1.1 Constraints"></a>2.1.1 Constraints</h3><p><strong>거의 테이블 생성 시에만 쓴다!!</strong></p>
+<ul>
+<li><code>NOT NULL</code><ul>
+<li><code>[constraint 제약조건명] not null</code></li>
+</ul>
+</li>
+<li><code>UNIQUE</code><ul>
+<li><code>[constraint 제약조건명] unique</code></li>
+</ul>
+</li>
+<li><code>PRIMARY KEY</code> : <code>NOT NULL</code> + <code>UNIQUE</code> + 테이블에서 딱 한 칼럼만 가능<ul>
+<li><code>[constraint 제약조건명] primary key</code></li>
+</ul>
+</li>
+<li><code>FOREIGN KEY</code> :  부모 테이블의 PK를 통해 자식 관계로 만들어줌<ul>
+<li><code>[constraint 제약조건명] references 부모테이블(부모테이블의 PK컬럼) </code></li>
+</ul>
+</li>
+<li><code>CHECK</code> : 해당 컬럼에 잘못된 데이터가 입력 되지 않기 위한 제약이다<ul>
+<li>&#96;&#96;[constraint 제약조건명] check (제약조건 with 컬럼명)&#96;<ul>
+<li><code>check (age &gt;= 18)</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>DEFAULT</code> : 제약조건은 아니지만 해당 열에 아무 값도 안넣으면 채워진다.</li>
+</ul>
+<h4 id="NOT-NULL-amp-Unique"><a href="#NOT-NULL-amp-Unique" class="headerlink" title="NOT NULL &amp; Unique"></a>NOT NULL &amp; Unique</h4><p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> NNTBL(</span><br><span class="line">	col1 number <span class="keyword">primary</span> key,</span><br><span class="line">	col2 varchar2(<span class="number">10</span>) <span class="keyword">constraint</span> NN_COL2_NNTBL <span class="keyword">not</span> <span class="keyword">null</span>,</span><br><span class="line">	col3 number <span class="keyword">not</span> <span class="keyword">null</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> nntbl(col1, col3) <span class="keyword">values</span>(<span class="number">3</span>, <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> UQTBL(</span><br><span class="line">	col1 number <span class="keyword">primary</span> key,</span><br><span class="line">	col2 varchar2(<span class="number">10</span>) <span class="keyword">constraint</span> UQ_COL2_UQTBL <span class="keyword">unique</span>,</span><br><span class="line">	col3 number <span class="keyword">unique</span> <span class="keyword">not</span> <span class="keyword">null</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> UQTBL(col1, col3) <span class="keyword">values</span>(<span class="number">3</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+<h4 id="Primary-Key"><a href="#Primary-Key" class="headerlink" title="Primary Key"></a>Primary Key</h4><ul>
+<li>기본 키(Primary Key) 참조무결성을 유지하기 위한 제약조건이다.<ul>
+<li>하나의 데이블에는 하나의 PK만 존재한다.</li>
+<li>PK로 설정되면 그 컬럼은 값이 중복되거나 NULL을 허용하지 않는다.</li>
+</ul>
+</li>
+<li>데이터베이스 테이블은 N : N 관계로 두면 안된다.<ul>
+<li>[<strong>학번</strong>,이름] , [<strong>동아리코드</strong>,동아리명] 은 N : N 관계이다.</li>
+<li>[(<strong>학번, 동아리코드</strong>), 이름] [<strong>동아리코드</strong>,동아리명] 은 N : 1 관계이다.</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--format 1</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span>  테이블명(</span><br><span class="line">	컬럼명<span class="number">1</span>  자료형<span class="number">1</span> [<span class="keyword">NOT</span> <span class="keyword">NULL</span>] [PK제약명] <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">	컬럼명N 자료형N</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">--format 2</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 테이블명(</span><br><span class="line">	컬럼명<span class="number">1</span>  자료형<span class="number">1</span>  [<span class="keyword">NOT</span> <span class="keyword">NULL</span>],</span><br><span class="line">	컬럼명N 자료형N,</span><br><span class="line">	[PK제약명]	<span class="keyword">PRIMARY</span> KEY(컬럼<span class="number">1</span>,컬럼<span class="number">2</span>,...) ## 복합키</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--nopk</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> nopk(</span><br><span class="line">	id varchar2(<span class="number">10</span>),</span><br><span class="line">	pwd varchar2(<span class="number">10</span>),</span><br><span class="line">	name nvarchar2(<span class="number">10</span>)</span><br><span class="line">);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> nopk <span class="keyword">VALUES</span>(<span class="string">&#x27;KIM&#x27;</span>, <span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;김길동&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> nopk <span class="keyword">VALUES</span>(<span class="string">&#x27;KIM&#x27;</span>, <span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;김길동&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> nopk(pwd, name) <span class="keyword">VALUES</span>(<span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;김길동&#x27;</span>);</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> nopk;</span><br><span class="line"></span><br><span class="line"><span class="comment">--yespk</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> yespk(</span><br><span class="line">	id varchar2(<span class="number">10</span>) <span class="keyword">constraint</span> PK_YESPK <span class="keyword">primary</span> key,</span><br><span class="line">	pwd varchar2(<span class="number">10</span>),</span><br><span class="line">	name nvarchar2(<span class="number">10</span>)</span><br><span class="line">);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> yespk <span class="keyword">VALUES</span>(<span class="string">&#x27;KIM&#x27;</span>, <span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;김길동&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> yespk <span class="keyword">VALUES</span>(<span class="string">&#x27;KIM&#x27;</span>, <span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;김길동&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> yespk(pwd, name) <span class="keyword">VALUES</span>(<span class="string">&#x27;1234&#x27;</span>, <span class="string">&#x27;김길동&#x27;</span>);</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> yespk;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- yespk1</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> yespk1(</span><br><span class="line">	id varchar2(<span class="number">10</span>) <span class="keyword">primary</span> key,</span><br><span class="line">	pwd varchar2(<span class="number">10</span>),</span><br><span class="line">	name nvarchar2(<span class="number">10</span>)</span><br><span class="line">);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> yespk1 <span class="keyword">values</span>(<span class="string">&#x27;kim&#x27;</span>, <span class="string">&#x27;1234&#x27;</span> , <span class="string">&#x27;김길동&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> yespk1 <span class="keyword">values</span>(<span class="string">&#x27;kim&#x27;</span>, <span class="string">&#x27;1234&#x27;</span> , <span class="string">&#x27;김길동&#x27;</span>); <span class="comment">-- 자동으로 붙여진 PK 제약명은 알아보기 힘들다</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> yespk2(</span><br><span class="line">	col1 varchar2(<span class="number">10</span>),</span><br><span class="line">	col2 varchar2(<span class="number">10</span>),</span><br><span class="line">	col3 varchar2(<span class="number">10</span>),</span><br><span class="line">    <span class="keyword">constraint</span> PK_YESPK2 <span class="keyword">primary</span> key(col1, col3)</span><br><span class="line">);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> yespk2 <span class="keyword">values</span>(<span class="string">&#x27;kim&#x27;</span>, <span class="string">&#x27;1234&#x27;</span> , <span class="string">&#x27;김길동&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> yespk2 <span class="keyword">values</span>(<span class="string">&#x27;kim&#x27;</span>, <span class="string">&#x27;1234&#x27;</span> , <span class="string">&#x27;김&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h4 id="Forein-Key"><a href="#Forein-Key" class="headerlink" title="Forein Key"></a>Forein Key</h4><p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> <span class="keyword">MEMBER</span> (</span><br><span class="line">	id varchar2(<span class="number">10</span>) <span class="keyword">primary</span> key,</span><br><span class="line">	name varchar2(<span class="number">10</span>)</span><br><span class="line">);</span><br><span class="line"><span class="comment">--부모없이 짜면</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> BOARD (</span><br><span class="line">	<span class="keyword">no</span> number <span class="keyword">primary</span> key,</span><br><span class="line">	id varchar2(<span class="number">10</span>),</span><br><span class="line">	title varchar2(<span class="number">10</span>)</span><br><span class="line">);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> board <span class="keyword">values</span>(<span class="number">1</span>, <span class="string">&#x27;kim&#x27;</span>, <span class="string">&#x27;제목1&#x27;</span>); <span class="comment">-- 멤버에 없어도 글이 써짐</span></span><br><span class="line"><span class="keyword">drop</span> <span class="keyword">table</span> board purge;</span><br><span class="line"></span><br><span class="line"><span class="comment">--부모있이 짜면</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> BOARD (</span><br><span class="line">	<span class="keyword">no</span> number <span class="keyword">primary</span> key,</span><br><span class="line">	id varchar2(<span class="number">10</span>) <span class="keyword">references</span> <span class="keyword">MEMBER</span>(id),</span><br><span class="line">	title varchar2(<span class="number">10</span>)</span><br><span class="line">);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">member</span> <span class="keyword">values</span>(<span class="string">&#x27;park&#x27;</span>, <span class="string">&#x27;박박박&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> board <span class="keyword">values</span>(<span class="number">1</span>, <span class="string">&#x27;kim&#x27;</span>, <span class="string">&#x27;제목1&#x27;</span>); <span class="comment">-- parent key not</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> board <span class="keyword">values</span>(<span class="number">1</span>, <span class="string">&#x27;park&#x27;</span>, <span class="string">&#x27;제목2&#x27;</span>);</span><br><span class="line"><span class="keyword">delete</span> <span class="keyword">member</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="string">&#x27;park&#x27;</span>; <span class="comment">-- child record found</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">drop</span> <span class="keyword">table</span> board purge;</span><br><span class="line"><span class="comment">-- ON DELETE CASCADE : 부모 삭제시 자식도 삭제되는 옵션</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> BOARD (</span><br><span class="line">	<span class="keyword">no</span> number <span class="keyword">primary</span> key,</span><br><span class="line">	id varchar2(<span class="number">10</span>) <span class="keyword">references</span> <span class="keyword">MEMBER</span>(id) <span class="keyword">ON</span> <span class="keyword">DELETE</span> CASCADE,</span><br><span class="line">	title varchar2(<span class="number">10</span>)</span><br><span class="line">);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> board <span class="keyword">values</span>(<span class="number">1</span>, <span class="string">&#x27;park&#x27;</span>, <span class="string">&#x27;제목2&#x27;</span>);</span><br><span class="line"><span class="keyword">delete</span> <span class="keyword">member</span> <span class="keyword">where</span> id<span class="operator">=</span><span class="string">&#x27;park&#x27;</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> board;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Default"><a href="#Default" class="headerlink" title="Default"></a>Default</h4><p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> DFTBL(</span><br><span class="line">	col1 number <span class="keyword">primary</span> key,</span><br><span class="line">	col2 varchar2(<span class="number">10</span>) <span class="keyword">not</span> <span class="keyword">null</span>,</span><br><span class="line">	col3 varchar2(<span class="number">10</span>),</span><br><span class="line">	col4 <span class="type">char</span>(<span class="number">1</span>) <span class="keyword">default</span> <span class="string">&#x27;Y&#x27;</span>,</span><br><span class="line">	col5 number <span class="keyword">default</span> <span class="number">100</span></span><br><span class="line">);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> DFTBL <span class="keyword">values</span>(<span class="number">1</span>, <span class="string">&#x27;kosmo&#x27;</span>, <span class="string">&#x27;kosmo2&#x27;</span>, <span class="string">&#x27;N&#x27;</span>, <span class="number">10</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> DFTBL(col1, col2) <span class="keyword">values</span>(<span class="number">2</span>, <span class="string">&#x27;코스모&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h4 id="Check"><a href="#Check" class="headerlink" title="Check"></a>Check</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span> 주민번호</span><br><span class="line"><span class="keyword">CHECK</span>(regexp_like(컬럼명,<span class="string">&#x27;^[0-9]&#123;6&#125;-[0-9]&#123;7&#125;$&#x27;</span>))</span><br><span class="line"></span><br><span class="line"><span class="operator">/</span><span class="operator">/</span> S로 시작하고 추가로 임의의 <span class="number">4</span>글자</span><br><span class="line"><span class="keyword">CHECK</span>(regexp_like(컬럼명,<span class="string">&#x27;^S.&#123;4&#125;$&#x27;</span>))</span><br><span class="line"></span><br><span class="line"><span class="operator">/</span><span class="operator">/</span> </span><br><span class="line">단,regexp_like함수는 <span class="keyword">select</span> regexp_like <span class="keyword">from</span> dual로 실행 안됨</span><br><span class="line">반드시 <span class="keyword">where</span>절에서 사용</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> CHKTBL(</span><br><span class="line">	col1 number <span class="keyword">primary</span> key,</span><br><span class="line">	col2 number <span class="keyword">constraint</span> chk_col2 <span class="keyword">check</span>(col2 <span class="operator">&gt;=</span> <span class="number">1</span> <span class="keyword">and</span> col2 <span class="operator">&lt;=</span> <span class="number">10</span>),</span><br><span class="line">	col3 <span class="type">char</span>(<span class="number">1</span>) <span class="keyword">check</span>(col3 <span class="keyword">in</span> (<span class="string">&#x27;Y&#x27;</span>, <span class="string">&#x27;N&#x27;</span>)),</span><br><span class="line">	col4 varchar2(<span class="number">50</span>) <span class="keyword">check</span>(regexp_like(col4, <span class="string">&#x27;^[a-zA-Z]&#123;1,&#125;@[a-zA-Z]&#123;1,&#125;\.[(com)(COM)]&#x27;</span>))</span><br><span class="line">);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> CHKTBL <span class="keyword">values</span>(<span class="number">1</span>, <span class="number">10</span>, <span class="string">&#x27;Y&#x27;</span>, <span class="string">&#x27;abc@bbb.com&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> CHKTBL <span class="keyword">values</span>(<span class="number">2</span>, <span class="number">11</span>, <span class="string">&#x27;Y&#x27;</span>, <span class="string">&#x27;def@bbb.com&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-Alter-DDL"><a href="#2-2-Alter-DDL" class="headerlink" title="2.2 Alter - DDL"></a>2.2 Alter - DDL</h2><p>테이블(및 다른 객체들)을 수정한다.</p>
+<h3 id="2-2-1-As-Table"><a href="#2-2-1-As-Table" class="headerlink" title="2.2.1 As : Table"></a>2.2.1 As : Table</h3><p>기존 테이블의 구조 와 내용을 그대로 복사한다.</p>
+<p>단, 모든 제약조건이 사라진다.</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> 복사테이블명</span><br><span class="line">	<span class="keyword">as</span></span><br><span class="line">		<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> 기존테이블명</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> chktbl2 <span class="keyword">as</span> <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> chktbl;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-2-Add"><a href="#2-2-2-Add" class="headerlink" title="2.2.2 Add"></a>2.2.2 Add</h3><p>새로운 컬럼 및 제약조건 추가 </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> 테이블명 <span class="keyword">add</span> 새칼럼명 자료형 [[<span class="keyword">constraint</span> 제약조건명] 제약조건]</span><br></pre></td></tr></table></figure>
+
+<p>제약조건을 붙이면 기존 데이터는 다 삭제해야한다.</p>
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">member</span> <span class="keyword">values</span>(<span class="string">&#x27;KIM&#x27;</span>, <span class="string">&#x27;김길동&#x27;</span>);</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> <span class="keyword">member</span> <span class="keyword">add</span> pwd varchar2(<span class="number">10</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>; <span class="comment">-- 오류</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> <span class="keyword">member</span> <span class="keyword">add</span> pwd varchar2(<span class="number">10</span>); <span class="comment">-- 그냥 칼럼 추가</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-3-Drop-column"><a href="#2-2-3-Drop-column" class="headerlink" title="2.2.3 Drop column"></a>2.2.3 Drop column</h3><p>기존 칼럼 제거</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> 테이블명 <span class="keyword">drop</span> <span class="keyword">column</span> 칼럼명</span><br></pre></td></tr></table></figure>
+
+<p>기존 제약조건 제거</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> 테이블명 <span class="keyword">drop</span> <span class="keyword">constraint</span> 제약조건명</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-4-Modify-field"><a href="#2-2-4-Modify-field" class="headerlink" title="2.2.4 Modify : field"></a>2.2.4 Modify : field</h3><p>기존 칼럼 데이터 타입 변경</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> 테이블명 modify 기존필드명 새로운필드타입</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>타입 변경 시 비어있어야 한다.</p>
+<p>작은 자료형으로 변경 시 기존 데이터가 모두 담길 수 있어야 한다.</p>
+</blockquote>
+<h3 id="2-2-5-Rename-column"><a href="#2-2-5-Rename-column" class="headerlink" title="2.2.5 Rename column"></a>2.2.5 Rename column</h3><p>기존 칼럼명 변경</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> 테이블명 rename <span class="keyword">column</span> 기존칼럼명 <span class="keyword">to</span> 새로운칼럼명</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-Drop-DDL"><a href="#2-3-Drop-DDL" class="headerlink" title="2.3 Drop - DDL"></a>2.3 Drop - DDL</h2><p>테이블(및 다른 객체들 + 제약조건) 삭제</p>
+<ul>
+<li><code>DROP TABLE 테이블명</code> : 테이블이 삭제 된후 휴지통에 들어감</li>
+<li><code>DROP TABLE 테이블명 PURGE</code> : 테이블 삭제시 휴지통에 안놓고 완전삭제</li>
+<li><code>FLASHBACK TABLE 테이블명 TO BEFORE DROP</code> : 휴지통에 들어간 테이블 복원시</li>
+<li><code>SHOW RECYCLEBIN</code> : 휴지통 내용보기</li>
+<li><code>PURGE RECYCLEBIN</code> : 휴지통 비우기</li>
+<li><code>PURGE TABLE 테이블명</code> : 휴지통에 들어간 특정 테이블 완전삭제</li>
+<li><code>DROP TABLE 부모테이블 CASCADE CONSTRAINT</code> : 자식이 참조하더라도 강제 삭제하는 경우 &#x2F;&#x2F; 자식테이블은 삭제 안됨</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">table</span> <span class="keyword">member</span>; <span class="comment">--referenced by foreign keys</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">member</span> <span class="keyword">values</span>(<span class="string">&#x27;park&#x27;</span>, <span class="string">&#x27;박박박&#x27;</span>);</span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> board <span class="keyword">values</span>(<span class="number">1</span>, <span class="string">&#x27;park&#x27;</span>, <span class="string">&#x27;제목2&#x27;</span>);</span><br><span class="line"><span class="keyword">drop</span> <span class="keyword">table</span> <span class="keyword">member</span> cascade <span class="keyword">constraint</span>; <span class="comment">-- 자식테이블들에 걸린 constraint들을 제거하면서 테이블 삭제</span></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> board; <span class="comment">-- 데이터 남아있음</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="3-권한-관리-DCL"><a href="#3-권한-관리-DCL" class="headerlink" title="3 권한 관리 (DCL)"></a>3 권한 관리 (DCL)</h1><p>권한에는 2가지 종류가 있다.</p>
+<h2 id="3-1-시스템-권한"><a href="#3-1-시스템-권한" class="headerlink" title="3.1 시스템 권한"></a>3.1 시스템 권한</h2><blockquote>
+<p>데이터베이스의 “메타”데이터를 수정할 수 있는 권한으로 생각된다.</p>
+</blockquote>
+<ul>
+<li>USER에 관한 권리 목록<ul>
+<li><strong>create user</strong>, alter user, <strong>drop user</strong></li>
+</ul>
+</li>
+<li>SESSION에 관한 권리 목록<ul>
+<li><strong>create session</strong>, alter session</li>
+</ul>
+</li>
+<li>TABLE에 관한 권리 목록<ul>
+<li><strong>create table</strong></li>
+<li>crate any table : 임의의 유저의 테이블 생성 권한</li>
+<li>alter any table, drop any table, insert any table, update any table, delete any table, select any table</li>
+</ul>
+</li>
+<li>INDEX에 관한<ul>
+<li>create any index, alter any index, drop any index</li>
+</ul>
+</li>
+<li>VIEW</li>
+<li>SEQUENCE</li>
+<li>ROLE</li>
+<li>…</li>
+</ul>
+<h3 id="3-1-1-부여-Grant-DCL"><a href="#3-1-1-부여-Grant-DCL" class="headerlink" title="3.1.1 부여 (Grant) - DCL"></a>3.1.1 부여 (Grant) - DCL</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Grant</span><br><span class="line">	시스템 권한1[, 시스템 권한2,...]</span><br><span class="line">	TO</span><br><span class="line">	사용자1[, 사용자2,..]</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-1-2-취소-Revoke-DCL"><a href="#3-1-2-취소-Revoke-DCL" class="headerlink" title="3.1.2 취소 (Revoke) - DCL"></a>3.1.2 취소 (Revoke) - DCL</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Revoke</span><br><span class="line">	시스템 권한1[, 시스템 권한2,...]</span><br><span class="line">	FROM</span><br><span class="line">	사용자1[, 사용자2,..]</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-객체-권한"><a href="#3-2-객체-권한" class="headerlink" title="3.2 객체 권한"></a>3.2 객체 권한</h2><blockquote>
+<p>데이터베이스의 일반데이터를 수정할 수 있는 권한으로 생각된다.</p>
+</blockquote>
+<ul>
+<li>TABLE에 관한 권리 목록<ul>
+<li><strong>SELECT, UPDATE, ALTER, DELETE, INSERT</strong></li>
+<li>INDEX, REFERENCES</li>
+</ul>
+</li>
+<li>VIEW에 관한 권리 목록<ul>
+<li><strong>SELECT, UPDATE, DELETE, INSERT</strong></li>
+<li>REFERENCES</li>
+</ul>
+</li>
+<li>SEQUENCE에 관한 권리 목록<ul>
+<li>SELECT, ALTER</li>
+</ul>
+</li>
+<li>FUNCTION에 관한 권리 목록<ul>
+<li>EXECUTE</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-2-1-부여-Grant-DCL"><a href="#3-2-1-부여-Grant-DCL" class="headerlink" title="3.2.1 부여 (Grant) - DCL"></a>3.2.1 부여 (Grant) - DCL</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Grant</span><br><span class="line">	객체 권한1[, 객체 권한2,...]</span><br><span class="line">	ON</span><br><span class="line">	스키마.객체이름</span><br><span class="line">	TO</span><br><span class="line">	사용자1[, 사용자2,..]</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-2-취소-Revoke-DCL"><a href="#3-2-2-취소-Revoke-DCL" class="headerlink" title="3.2.2 취소 (Revoke) - DCL"></a>3.2.2 취소 (Revoke) - DCL</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Revoke</span><br><span class="line">	객체 권한1[, 객체 권한2,...]</span><br><span class="line">	ON</span><br><span class="line">	스키마.객체이름</span><br><span class="line">	FROM</span><br><span class="line">	사용자1[, 사용자2,..]</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-유저-amp-롤에-대한-관리"><a href="#4-유저-amp-롤에-대한-관리" class="headerlink" title="4 유저 &amp; 롤에 대한 관리"></a>4 유저 &amp; 롤에 대한 관리</h1><p><strong>“유저”</strong> 관리 (Create User, Alter User, Drop User)</p>
+<h2 id="4-1-유저-관리"><a href="#4-1-유저-관리" class="headerlink" title="4.1 유저 관리"></a>4.1 유저 관리</h2><h3 id="4-1-1-CREATE-User"><a href="#4-1-1-CREATE-User" class="headerlink" title="4.1.1 CREATE - User"></a>4.1.1 CREATE - User</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">USER</span> 아이디 IDENTIFIED <span class="keyword">BY</span> 암호;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-1-2-ALTER-User"><a href="#4-1-2-ALTER-User" class="headerlink" title="4.1.2 ALTER - User"></a>4.1.2 ALTER - User</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> 아이디 identified <span class="keyword">by</span> 새암호;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> 아이디 account lock;</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> 아이디 account unlock;</span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">USER</span>  사용자아이디 QUOTA  할당량 <span class="keyword">On</span> Users; <span class="comment">-- 유저 테이블 스페이스에 생성가능</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">USER</span>  사용자아이디 QUOTA  할당량 <span class="keyword">On</span> <span class="keyword">System</span>; <span class="comment">-- 시스템 테이블 스페이스에 생성가능</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-1-3-REVOKE-User"><a href="#4-1-3-REVOKE-User" class="headerlink" title="4.1.3 REVOKE - User"></a>4.1.3 REVOKE - User</h3><p><code>REVOKE 권한/역할 FROM 사용자;</code></p>
+<h3 id="4-1-4-DROP-User"><a href="#4-1-4-DROP-User" class="headerlink" title="4.1.4 DROP - User"></a>4.1.4 DROP - User</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">user</span> 아이디 cascade;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-1-5-유저-정보-조회"><a href="#4-1-5-유저-정보-조회" class="headerlink" title="4.1.5 유저 정보 조회"></a>4.1.5 유저 정보 조회</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> all_users <span class="keyword">where</span> usename <span class="operator">=</span> <span class="string">&#x27;scott&#x27;</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> dba_users <span class="keyword">where</span> usename <span class="operator">=</span> <span class="string">&#x27;scott&#x27;</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> dba_objects <span class="keyword">where</span> owner <span class="operator">=</span> <span class="string">&#x27;scott&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-2-롤-관리"><a href="#4-2-롤-관리" class="headerlink" title="4.2 롤 관리"></a>4.2 롤 관리</h2><h3 id="4-2-1-사전-정의된-롤"><a href="#4-2-1-사전-정의된-롤" class="headerlink" title="4.2.1 사전 정의된 롤"></a>4.2.1 사전 정의된 롤</h3><ul>
+<li>CONNECT<ul>
+<li>create session</li>
+</ul>
+</li>
+<li>RESOURCE<ul>
+<li>create trigger</li>
+<li>create sequence</li>
+<li>create  type</li>
+<li>create procedure</li>
+<li>create cluster</li>
+<li>create operator</li>
+<li>create indextype</li>
+<li>create table</li>
+</ul>
+</li>
+<li>DBA<ul>
+<li>거의 모든</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-2-2-사용자-정의-롤"><a href="#4-2-2-사용자-정의-롤" class="headerlink" title="4.2.2 사용자 정의 롤"></a>4.2.2 사용자 정의 롤</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 롤 관리 (생성)</span></span><br><span class="line"><span class="keyword">CREATE</span> ROLE STAFF;</span><br><span class="line"><span class="comment">-- 권한 관리 (부여)</span></span><br><span class="line"><span class="keyword">GRANT</span> <span class="keyword">CREATE</span> <span class="keyword">TABLE</span>, <span class="keyword">CREATE</span> <span class="keyword">VIEW</span> <span class="keyword">TO</span> STAFF;</span><br><span class="line"><span class="keyword">GRANT</span> STAFF <span class="keyword">TO</span> 사용자<span class="number">1</span>,사용자<span class="number">2</span>;</span><br><span class="line"><span class="comment">-- 권한 관리 (취소)</span></span><br><span class="line"><span class="keyword">REVOKE</span> STAFF <span class="keyword">FROM</span> 사용자<span class="number">1</span>;</span><br><span class="line"><span class="comment">-- 롤 관리 (삭제)</span></span><br><span class="line"><span class="keyword">DROP</span> ROLE STAFF;</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-테이블-외에-자주-사용되는-객체"><a href="#5-테이블-외에-자주-사용되는-객체" class="headerlink" title="5 테이블 외에 자주 사용되는 객체"></a>5 테이블 외에 자주 사용되는 객체</h1><h2 id="5-1-데이터-사전"><a href="#5-1-데이터-사전" class="headerlink" title="5.1 데이터 사전"></a>5.1 데이터 사전</h2><p>테이블은 user table과 data dictionary로 나뉜다.</p>
+<p>데이터 사전은 데이터베이스를 운영하는 데 필요한 모든 정보를 저장하는 특수 테이블이다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select * from dict; --현재 접속한 계정에서 사용 가능한 데이터 사전</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-1-1-USER-접두어를-가진-데이터-사전"><a href="#5-1-1-USER-접두어를-가진-데이터-사전" class="headerlink" title="5.1.1 USER_ 접두어를 가진 데이터 사전"></a>5.1.1 <code>USER_</code> 접두어를 가진 데이터 사전</h3><p>현재 접속한 사용자가 소유한 객체에 대한 정보들</p>
+<ul>
+<li><code>user_tables</code><ul>
+<li><code>table_name</code></li>
+</ul>
+</li>
+<li><code>user_cons_columns</code></li>
+<li><code>user_indexes</code><ul>
+<li><code>index_name</code>, <code>table_name</code></li>
+<li><code>index_type</code>, <code>table_owner</code>, <code>table_type</code>, <code>uniqueness</code>, <code>compression</code></li>
+</ul>
+</li>
+<li><code>user_ind_columns</code><ul>
+<li><code>index_name</code>, <code>table_name</code></li>
+<li><code>column_name</code>, <code>column_position</code>, <code>column_length</code>, <code>char_length</code>, <code>descend</code></li>
+</ul>
+</li>
+<li><code>user_views</code><ul>
+<li><code>view_name</code>, <code>text</code></li>
+</ul>
+</li>
+<li><code>user_sequences</code><ul>
+<li><code>min_value</code>, <code>max_value</code>, <code>increment_by</code></li>
+</ul>
+</li>
+<li>…</li>
+</ul>
+<h3 id="5-1-2-ALL-접두어를-가진-데이터-사전"><a href="#5-1-2-ALL-접두어를-가진-데이터-사전" class="headerlink" title="5.1.2 ALL_ 접두어를 가진 데이터 사전"></a>5.1.2 <code>ALL_</code> 접두어를 가진 데이터 사전</h3><p>현재 접속한 사용자가 사용할 수 있는 모든 객체에 대한 정보들</p>
+<ul>
+<li><code>all_tables</code><ul>
+<li><code>owner</code></li>
+<li><code>table_name</code></li>
+</ul>
+</li>
+<li>…</li>
+</ul>
+<h3 id="5-1-3-DBA-접두어를-가진-데이터-사전"><a href="#5-1-3-DBA-접두어를-가진-데이터-사전" class="headerlink" title="5.1.3 DBA_ 접두어를 가진 데이터 사전"></a>5.1.3 <code>DBA_</code> 접두어를 가진 데이터 사전</h3><p>관리 권한을 가진 사용자만 조회할 수 있다.</p>
+<ul>
+<li><code>DBA_TABLES</code></li>
+<li><code>DBA_USERS</code></li>
+</ul>
+<h2 id="5-2-Index"><a href="#5-2-Index" class="headerlink" title="5.2 Index"></a>5.2 Index</h2><p>행의 검색 속도를 향상 시킬 수 있는 객체이다.</p>
+<p>PK, UK 설정 시 자동으로 인덱스가 생성된다.</p>
+<p>insert, update, delete가 많은 컬럼에 대해서 index를 되도록이면 설정하지 말아라</p>
+<p>어느 컬럼에  인덱스를 설정하는가?</p>
+<ol>
+<li><p><strong>WHERE</strong>나 <strong>JOIN</strong>에서 자주 사용되는 컬럼 중에서도</p>
+<ol>
+<li><p><strong>광범위한 값</strong>을 포함하는 컬럼 (많이 겹치면 노쓸모)</p>
+<p>혹은</p>
+</li>
+<li><p>많은 NULL값을 포함하는 컬럼</p>
+</li>
+</ol>
+</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> index 인덱스명 <span class="keyword">on</span> 테이블명(칼럼명<span class="number">1</span> [<span class="keyword">DESC</span>], ...);</span><br><span class="line"><span class="keyword">drop</span> index 인덱스명;</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> index idx_sal_emp <span class="keyword">on</span> emp(sal); <span class="comment">-- 단일인덱스</span></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">where</span> sal <span class="operator">&gt;</span> <span class="number">1000</span>;</span><br><span class="line"><span class="keyword">drop</span> index idx_sal_emp;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> index idx_sal_deptno_emp <span class="keyword">on</span> emp(sal, deptno); <span class="comment">-- 복합인덱스는 where절에서 자주 묶일 때 유용!</span></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">where</span> sal <span class="operator">&gt;</span> <span class="number">1000</span> <span class="keyword">and</span> deptno <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line"><span class="keyword">drop</span> index idx_sal_deptno_emp;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">unique</span> index idx_name_emp <span class="keyword">on</span> emp(ename); <span class="comment">-- 고유 인덱스 설정 안할 경우 Non Unique가 디폴트임</span></span><br><span class="line"><span class="keyword">drop</span> index idx_name_emp;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-3-View"><a href="#5-3-View" class="headerlink" title="5.3 View"></a>5.3 View</h2><p>SELECT문을 사용해 만든 <strong>임시 테이블</strong>이다. </p>
+<p>조회 목적이다.</p>
+<ol>
+<li>보안성 - 연봉 정보와 같이 공개하고 싶지 않은 컬럼을 숨길수 잇어 보안을 유지 할 수 있다.</li>
+<li>편의성 - 여러 개의 테이블 사용을 위해 복잡한 조인이 사용되었다 하더라도 사용자는 이를 몰라도 된다.</li>
+<li>간결성 - 뷰를 사용하면 APPLICATION을 개발할 때 복잡한 쿼리문을 숨길 수 있어 소스가 간결해 진다.</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> [<span class="keyword">or</span> replace] <span class="keyword">view</span> <span class="keyword">view</span>명[(&quot;new컬럼명1&quot;, &quot;new컬럼명2&quot;, ...)]</span><br><span class="line">	<span class="keyword">as</span> <span class="keyword">select</span>문</span><br><span class="line">   	[<span class="keyword">with</span> read <span class="keyword">only</span>] <span class="comment">--뷰를 읽기전용으로 만들때</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--or replace는 이미 존재한다면 다시 생성하라는 의미이다.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">drop</span> <span class="keyword">view</span> <span class="keyword">view</span>명</span><br></pre></td></tr></table></figure>
+
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">or</span> replace <span class="keyword">view</span> vw_emp(&quot;사번&quot;, &quot;이름&quot;, &quot;직책&quot;, &quot;고용일&quot;,&quot;부서코드&quot;)</span><br><span class="line">	<span class="keyword">as</span></span><br><span class="line">    <span class="keyword">select</span> empno, ename, job, hiredate, deptno</span><br><span class="line">	<span class="keyword">from</span> emp;</span><br><span class="line">	</span><br><span class="line"><span class="keyword">desc</span> vw_emp;</span><br><span class="line"></span><br><span class="line"><span class="keyword">update</span> vw_emp</span><br><span class="line">	<span class="keyword">set</span> 부서코드<span class="operator">=</span><span class="number">30</span>, 직책<span class="operator">=</span><span class="string">&#x27;SALESMAN&#x27;</span></span><br><span class="line">	<span class="keyword">where</span> 사번<span class="operator">=</span><span class="number">7934</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">or</span> replace <span class="keyword">view</span> VW_EMP_DEPT</span><br><span class="line">	<span class="keyword">as</span></span><br><span class="line">	<span class="keyword">select</span> E.<span class="operator">*</span>, dname, loc</span><br><span class="line">	<span class="keyword">from</span> emp E <span class="keyword">join</span> dept D <span class="keyword">on</span> E.deptno <span class="operator">=</span> D.deptno</span><br><span class="line">	<span class="keyword">order</span> <span class="keyword">by</span> ename;</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> VW_EMP_DEPT;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-4-시퀀스"><a href="#5-4-시퀀스" class="headerlink" title="5.4 시퀀스"></a>5.4 시퀀스</h2><p>테이블의 필드에 일련번호 부여한다.</p>
+<p>테이블 생성 후 시퀀스(일련번호)를 따로 만들어야 한다.</p>
+<blockquote>
+<p>시퀀스를 모르면 다음과 같이 멍청한 방식으로 일련 번호를 추가하게된다</p>
+<p>INSERT INTO 테이블명(NO) VALUES((SELECT MAX(NO)+1 FROM 테이블명));</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> sequence 시퀀스명 </span><br><span class="line">	[increment <span class="keyword">by</span> 증가값]</span><br><span class="line">	[<span class="keyword">start</span> <span class="keyword">with</span> 시작값]</span><br><span class="line">	[maxvalue 최대값]</span><br><span class="line">	[minvalue 최솟값]</span><br><span class="line">	[<span class="keyword">cycle</span> <span class="operator">|</span> nocycle] <span class="comment">-- 최댓값에 도달한 후 다시 시작값으로 / PRIMARY KEY에 CYCLE옵션지정하면 안됨</span></span><br><span class="line">    [cache <span class="operator">|</span> nocache] <span class="comment">-- 오라클 서버가 sequence 값을 캐시 메모리에 할당할 지 말 지</span></span><br><span class="line">    </span><br><span class="line"><span class="keyword">alter</span> sequence 시퀀스명</span><br><span class="line">	[increment <span class="keyword">by</span> 증가값]</span><br><span class="line">	[maxvalue 최대값]</span><br><span class="line">	[minvalue 최솟값]</span><br><span class="line">	[<span class="keyword">cycle</span> <span class="operator">|</span> nocycle]</span><br><span class="line">    [cache <span class="operator">|</span> nocache]</span><br><span class="line"></span><br><span class="line"><span class="keyword">drop</span> sequence 시퀀스명</span><br></pre></td></tr></table></figure>
+
+<p>시퀀스 객체의 멤버</p>
+<ul>
+<li><code>CURRVAL</code> : 현재의 일련번호 값을 반환</li>
+<li><code>NEXTVAL</code> : 다음의 일련번호 값을 반환</li>
+</ul>
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> sequence seq_board</span><br><span class="line">	increment <span class="keyword">by</span> <span class="number">2</span></span><br><span class="line">	<span class="keyword">start</span> <span class="keyword">with</span> <span class="number">2</span></span><br><span class="line">	maxvalue <span class="number">40</span></span><br><span class="line">	<span class="keyword">cycle</span></span><br><span class="line">	nocache;</span><br><span class="line"><span class="comment">--select seq_board.NEXTVAL from dual; -- dual은 그냥 임시 테이블임</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> board <span class="keyword">values</span>(seq_board.nextval, <span class="string">&#x27;KIM&#x27;</span>, <span class="string">&#x27;제목&#x27;</span> <span class="operator">||</span> seq_board.currval);</span><br></pre></td></tr></table></figure>
+
+<h1 id="6-오라클-주요-내장함수"><a href="#6-오라클-주요-내장함수" class="headerlink" title="6. 오라클 주요 내장함수"></a>6. 오라클 주요 내장함수</h1><h2 id="6-1-문자열-관련"><a href="#6-1-문자열-관련" class="headerlink" title="6.1 문자열 관련"></a>6.1 문자열 관련</h2><ul>
+<li><p><code>NVL(문자열, NULL인 경우 대체할 값) </code> : 테이블 열 수준의 벡터 데이터만 처리함</p>
+</li>
+<li><p><code>LOWER(문자열)</code>, <code>UPPER(문자열)</code></p>
+</li>
+<li><p><code>INITCAP(문자열)</code> : 첫 문자를 대문자로, 나머지는 소문자로</p>
+</li>
+<li><p><code>CONCAT(문자열, 문자열)</code></p>
+</li>
+<li><p><code>LENGTH(문자열)</code>, <code>LENGTHB(문자열)</code> : 문자열 바이트 수</p>
+</li>
+<li><p><code>RPAD(문자열, 전체 자리수,&#39;지정문자&#39;)</code>, <code>LPAD(문자열, 전체 자리수,&#39;지정문자&#39;)</code> : 우(좌)측을 지정한 값으로 채운다</p>
+</li>
+<li><p><code>INSTR(문자열, 찾을 문자열)</code> : 문자열 인덱스 반환, 없으면 0 출력</p>
+</li>
+<li><p><code>SUBSTR(문자열, 시작인덱스, 길이)</code></p>
+</li>
+<li><p><code>REPLACE(문자열, 바꿀문자열, 바뀔문자열)</code></p>
+</li>
+<li><p><code>TO_NUMBER(숫자인문자열)</code></p>
+</li>
+<li><p><code>TO_CHAR</code></p>
+<ul>
+<li><p><code>TO_CHAR(숫자 혹은 날짜)</code></p>
+</li>
+<li><p><code>TO_CHAR(숫자 혹은 날짜, 숫자포맷 혹은 날짜포맷)</code></p>
+<ul>
+<li><p>9는 값이 있으면 표시 ,없으면 표시 안함</p>
+</li>
+<li><p>0는 값이 있으면 표시, 없으면 0으로 표시</p>
+</li>
+<li><p>단,소수점은 9든 0이든 값이 없으면 모두 0으로 표시됨</p>
+</li>
+<li><p>단, 실제값의 정수 자리수가 더 많으면 값이 #으로 표시됨</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> TO_CHAR(<span class="number">123</span>, <span class="string">&#x27;0999&#x27;</span>) <span class="keyword">FROM</span> DUAL; <span class="comment">--+&gt;0123</span></span><br><span class="line"><span class="keyword">SELECT</span> TO_CHAR(<span class="number">123</span>, <span class="string">&#x27;9999&#x27;</span>) <span class="keyword">FROM</span> DUAL; <span class="comment">--+&gt; 123</span></span><br><span class="line"><span class="keyword">SELECT</span> TO_CHAR(<span class="number">1234</span>, <span class="string">&#x27;$999,999.99&#x27;</span>) <span class="keyword">FROM</span> DUAL <span class="comment">--+&gt;$1,234.00</span></span><br><span class="line"><span class="keyword">SELECT</span> TO_CHAR(<span class="number">1234</span>, <span class="string">&#x27;$999,999.00&#x27;</span>) <span class="keyword">FROM</span> DUAL <span class="comment">--+&gt;$1,234.00</span></span><br><span class="line"><span class="keyword">SELECT</span> TO_CHAR(<span class="number">1234</span>, <span class="string">&#x27;L999,999&#x27;</span>) <span class="keyword">FROM</span> DUAL <span class="comment">--+&gt; 지역화폐단위1,234</span></span><br><span class="line"><span class="keyword">SELECT</span> TO_CHAR(<span class="number">1234</span>, <span class="string">&#x27;l999,999&#x27;</span>) <span class="keyword">FROM</span> DUAL <span class="comment">--+&gt; 지역화폐단위1,234</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>날짜형 문법</p>
+<ul>
+<li><p>yy:년도 2자리만</p>
+</li>
+<li><p>yyyy:년도 4자리</p>
+</li>
+<li><p>mm:01~12형태의 월</p>
+</li>
+<li><p>d: 요일 반환(일요일은 1,월요일 2)</p>
+</li>
+<li><p>dd:1~31형태의 일 표시</p>
+</li>
+<li><p>ddd:해당 년도의 1월 1일부터 현재까지의 일수</p>
+</li>
+<li><p>AM(혹은 PM) : 오전, 오후</p>
+</li>
+<li><p>HH : 1~12시 형태로 표시</p>
+</li>
+<li><p>HH12 : 1~12시 형태로 표시</p>
+</li>
+<li><p>HH24 : 0~23시</p>
+</li>
+<li><p>MI:0~59분</p>
+</li>
+<li><p>SS:0~59초</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> TO_CHAR(SYSDATE,<span class="string">&#x27;YYYY-MM-DD HH:MI:SS&#x27;</span>) <span class="keyword">FROM</span> DUAL;</span><br><span class="line"><span class="keyword">SELECT</span> TO_CHAR(SYSDATE,<span class="string">&#x27;YYYY&quot;년&quot;MM&quot;월&quot;DD&quot;일&quot; HH&quot;시&quot;MI&quot;분&quot;SS&quot;초&quot;&#x27;</span>) <span class="keyword">FROM</span> DUAL;</span><br><span class="line"><span class="comment">--to_date</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><code>TO_DATE(문자열)</code></p>
+<ul>
+<li><p>TO_DATE(‘2000[특수문자]10[특수문자]20’)</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> TO_CHAR(TO_DATE(<span class="string">&#x27;2012/10/1&#x27;</span>),<span class="string">&#x27;HH&#x27;</span>) <span class="keyword">FROM</span> DUAL;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p>예시 코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--nvl</span></span><br><span class="line"><span class="keyword">select</span> ename, nvl(comm, <span class="number">-1</span>) <span class="keyword">from</span> emp;</span><br><span class="line"><span class="comment">--lower, upper</span></span><br><span class="line"><span class="keyword">select</span> ename, <span class="built_in">lower</span>(ename) <span class="keyword">from</span> emp;</span><br><span class="line"><span class="keyword">select</span> ename, job <span class="keyword">from</span> emp <span class="keyword">where</span> <span class="built_in">lower</span>(job)<span class="operator">=</span><span class="string">&#x27;salesman&#x27;</span>;</span><br><span class="line"><span class="comment">--concat</span></span><br><span class="line"><span class="keyword">select</span> concat(concat(first_name, <span class="string">&#x27; &#x27;</span>), last_name) <span class="keyword">as</span> name <span class="keyword">from</span> employees;</span><br><span class="line"><span class="comment">--length</span></span><br><span class="line"><span class="keyword">SELECT</span> LENGTH(<span class="string">&#x27;오라클&#x27;</span>) <span class="keyword">FROM</span> DUAL;</span><br><span class="line"><span class="keyword">SELECT</span> LENGTHB(<span class="string">&#x27;오라클&#x27;</span>) <span class="keyword">FROM</span> DUAL;</span><br><span class="line"><span class="comment">--lpad, rpad</span></span><br><span class="line"><span class="keyword">SELECT</span> LPAD(<span class="string">&#x27;HELLO&#x27;</span>, <span class="number">10</span>, <span class="string">&#x27;X&#x27;</span>) <span class="keyword">FROM</span> DUAL;</span><br><span class="line"><span class="comment">--instr</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> DEPT <span class="keyword">WHERE</span> instr(<span class="built_in">LOWER</span>(DNAME),<span class="string">&#x27;e&#x27;</span>) <span class="operator">!=</span><span class="number">0</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> DEPT <span class="keyword">WHERE</span> <span class="built_in">LOWER</span>(DNAME) <span class="keyword">like</span> <span class="string">&#x27;%e%&#x27;</span></span><br><span class="line"><span class="comment">--substr</span></span><br><span class="line"><span class="keyword">SELECT</span> SUBSTR(<span class="string">&#x27;123456789&#x27;</span>,<span class="number">3</span>,<span class="number">3</span>) <span class="keyword">FROM</span> DUAL;</span><br><span class="line"><span class="keyword">SELECT</span> RPAD(substr(ename, <span class="number">1</span>, <span class="number">1</span>), length(ename), <span class="string">&#x27;*&#x27;</span>) <span class="keyword">FROM</span> emp;</span><br><span class="line"><span class="comment">--replace</span></span><br><span class="line"><span class="keyword">select</span> job, replace(<span class="built_in">upper</span>(job), <span class="string">&#x27;man&#x27;</span>, <span class="string">&#x27;woman&#x27;</span>) <span class="keyword">from</span> emp;</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-2-날짜-관련"><a href="#6-2-날짜-관련" class="headerlink" title="6.2 날짜 관련"></a>6.2 날짜 관련</h2><ul>
+<li><code>MONTHS_BETWEEN(DATE타입, DATE타입);</code><ul>
+<li><code>SELECT MONTHS_BETWEEN(SYSDATE, TO_DATE(&#39;2012/01/01&#39;))</code></li>
+</ul>
+</li>
+<li><code>SELECT ADD_MONTHS(DATE타입, 추가개월) FROM DUAL</code></li>
+<li>일(day) 단위의 더하기는 그냥 숫자 더하듯이 하면 됨</li>
+</ul>
+<h2 id="6-3-수학-관련"><a href="#6-3-수학-관련" class="headerlink" title="6.3 수학 관련"></a>6.3 수학 관련</h2><ul>
+<li><code>ROUND(숫자형)</code>, <code>FLOOR()</code>, <code>CEIL()</code></li>
+<li><code>MOD(숫자형, 나눔단위)</code></li>
+<li><code>POWER(2,3)</code>, <code>SQRT(10)</code></li>
+</ul>
+<h2 id="6-4-논리-관련"><a href="#6-4-논리-관련" class="headerlink" title="6.4 논리 관련"></a>6.4 논리 관련</h2><ul>
+<li><p><code>DECODE(표현식, 값1, 결과값1, 값2, 결과값2, ... , 값N, 결과값N, 기본값)</code></p>
+<ul>
+<li><code>decode(job,&#39;MANAGER&#39;,&#39;매니저&#39;,&#39;SALESMAN&#39;,&#39;영업맨&#39;,&#39;기타&#39;)</code></li>
+<li>대입 연산만 가능하다.</li>
+</ul>
+</li>
+<li><p>Case (조건을 직접 정의할 수 있는 일반적인 <code>DECODE</code>)</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CASE</span></span><br><span class="line">	<span class="keyword">WHEN</span> 조건<span class="number">1</span> <span class="keyword">THEN</span> 결과값<span class="number">1</span></span><br><span class="line">	<span class="keyword">WHEN</span> 조건<span class="number">2</span> <span class="keyword">THEN</span> 결과값<span class="number">2</span></span><br><span class="line">	..................</span><br><span class="line">	<span class="keyword">WHEN</span> 조건N <span class="keyword">THEN</span> 결과값N</span><br><span class="line">	<span class="keyword">ELSE</span>  그외</span><br><span class="line">	<span class="keyword">END</span> <span class="keyword">AS</span> 새칼럼명</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>예시코드</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> ename,</span><br><span class="line">	<span class="keyword">CASE</span> <span class="keyword">WHEN</span> JOB <span class="operator">=</span> <span class="string">&#x27;MANAGER&#x27;</span> <span class="keyword">THEN</span> <span class="string">&#x27;매니저&#x27;</span></span><br><span class="line">		<span class="keyword">WHEN</span> JOB <span class="operator">=</span> <span class="string">&#x27;SALESMAN&#x27;</span> <span class="keyword">THEN</span> <span class="string">&#x27;영업맨&#x27;</span></span><br><span class="line">		<span class="keyword">ELSE</span> <span class="string">&#x27;기타&#x27;</span></span><br><span class="line">	<span class="keyword">END</span> <span class="keyword">AS</span> JOB</span><br><span class="line"><span class="keyword">FROM</span> EMP;</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> </span><br><span class="line">	last_name, </span><br><span class="line">	rpad(substr(email, <span class="number">1</span>, <span class="number">1</span>), length(email), <span class="string">&#x27;*&#x27;</span>),</span><br><span class="line">	TO_CHAR(salary,<span class="string">&#x27;$999,999&#x27;</span>),</span><br><span class="line">	<span class="keyword">CASE</span></span><br><span class="line">		<span class="keyword">WHEN</span> salary <span class="operator">&gt;</span> <span class="number">10000</span> <span class="keyword">THEN</span> <span class="string">&#x27;고액연봉&#x27;</span></span><br><span class="line">		<span class="keyword">WHEN</span> salary <span class="operator">&gt;</span> <span class="number">5000</span> <span class="keyword">THEN</span> <span class="string">&#x27;중간연봉&#x27;</span></span><br><span class="line">		<span class="keyword">ELSE</span> <span class="string">&#x27;보통연봉&#x27;</span></span><br><span class="line">		<span class="keyword">END</span> <span class="keyword">AS</span> salary2,</span><br><span class="line">	TO_CHAR(hire_date, <span class="string">&#x27;yyyy&quot;년&quot; mm&quot;월&quot; dd&quot;일&quot;&#x27;</span>)</span><br><span class="line">	<span class="keyword">from</span> employees</span><br><span class="line">	<span class="keyword">where</span> substr(last_name, length(last_name), <span class="number">1</span>) <span class="operator">=</span> <span class="string">&#x27;t&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h1 id="7-백업과-복원"><a href="#7-백업과-복원" class="headerlink" title="7. 백업과 복원"></a>7. 백업과 복원</h1><p>예시코드</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">exp userid=scott/scott@xe file=D:\scott_dump.dmp</span><br><span class="line"></span><br><span class="line">drop table emp;</span><br><span class="line">PURGE RECYCLEBIN;</span><br><span class="line">select table_name from user_tables;</span><br><span class="line"></span><br><span class="line">imp scott/scott@xe file=d:\scott_dump.dmp ignore=y</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SQL/" rel="tag"># SQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/12/hello-world/" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/13/PLSQL-Transaction/" rel="next" title="PLSQL+Transaction">
+      PLSQL+Transaction <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-DML"><span class="nav-text">1 DML</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-SELECT-DML"><span class="nav-text">1.1 SELECT - DML</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-JOIN"><span class="nav-text">1.1.1 JOIN</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#INNER-JOIN"><span class="nav-text">INNER JOIN</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#OUTER-JOIN"><span class="nav-text">OUTER JOIN</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SELF-JOIN"><span class="nav-text">SELF JOIN</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2-TOP-Query"><span class="nav-text">1.1.2 TOP Query</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-Insert-DML"><span class="nav-text">1.2 Insert - DML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-Update-DML"><span class="nav-text">1.3 Update - DML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-Delete-DML"><span class="nav-text">1.4 Delete - DML</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-DDL-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EA%B5%AC%EC%A1%B0-%EC%A0%95%EC%9D%98"><span class="nav-text">2 DDL - 데이터 구조 정의</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-CREATE-DDL"><span class="nav-text">2.1 CREATE - DDL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-Constraints"><span class="nav-text">2.1.1 Constraints</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NOT-NULL-amp-Unique"><span class="nav-text">NOT NULL &amp; Unique</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Primary-Key"><span class="nav-text">Primary Key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Forein-Key"><span class="nav-text">Forein Key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Default"><span class="nav-text">Default</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Check"><span class="nav-text">Check</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-Alter-DDL"><span class="nav-text">2.2 Alter - DDL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-1-As-Table"><span class="nav-text">2.2.1 As : Table</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2-Add"><span class="nav-text">2.2.2 Add</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-3-Drop-column"><span class="nav-text">2.2.3 Drop column</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-4-Modify-field"><span class="nav-text">2.2.4 Modify : field</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-5-Rename-column"><span class="nav-text">2.2.5 Rename column</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Drop-DDL"><span class="nav-text">2.3 Drop - DDL</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%EA%B6%8C%ED%95%9C-%EA%B4%80%EB%A6%AC-DCL"><span class="nav-text">3 권한 관리 (DCL)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%EC%8B%9C%EC%8A%A4%ED%85%9C-%EA%B6%8C%ED%95%9C"><span class="nav-text">3.1 시스템 권한</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-%EB%B6%80%EC%97%AC-Grant-DCL"><span class="nav-text">3.1.1 부여 (Grant) - DCL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2-%EC%B7%A8%EC%86%8C-Revoke-DCL"><span class="nav-text">3.1.2 취소 (Revoke) - DCL</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%EA%B0%9D%EC%B2%B4-%EA%B6%8C%ED%95%9C"><span class="nav-text">3.2 객체 권한</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1-%EB%B6%80%EC%97%AC-Grant-DCL"><span class="nav-text">3.2.1 부여 (Grant) - DCL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-2-%EC%B7%A8%EC%86%8C-Revoke-DCL"><span class="nav-text">3.2.2 취소 (Revoke) - DCL</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%EC%9C%A0%EC%A0%80-amp-%EB%A1%A4%EC%97%90-%EB%8C%80%ED%95%9C-%EA%B4%80%EB%A6%AC"><span class="nav-text">4 유저 &amp; 롤에 대한 관리</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%EC%9C%A0%EC%A0%80-%EA%B4%80%EB%A6%AC"><span class="nav-text">4.1 유저 관리</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-1-CREATE-User"><span class="nav-text">4.1.1 CREATE - User</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-2-ALTER-User"><span class="nav-text">4.1.2 ALTER - User</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-3-REVOKE-User"><span class="nav-text">4.1.3 REVOKE - User</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-4-DROP-User"><span class="nav-text">4.1.4 DROP - User</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-5-%EC%9C%A0%EC%A0%80-%EC%A0%95%EB%B3%B4-%EC%A1%B0%ED%9A%8C"><span class="nav-text">4.1.5 유저 정보 조회</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-%EB%A1%A4-%EA%B4%80%EB%A6%AC"><span class="nav-text">4.2 롤 관리</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-1-%EC%82%AC%EC%A0%84-%EC%A0%95%EC%9D%98%EB%90%9C-%EB%A1%A4"><span class="nav-text">4.2.1 사전 정의된 롤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-2-%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%A0%95%EC%9D%98-%EB%A1%A4"><span class="nav-text">4.2.2 사용자 정의 롤</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%ED%85%8C%EC%9D%B4%EB%B8%94-%EC%99%B8%EC%97%90-%EC%9E%90%EC%A3%BC-%EC%82%AC%EC%9A%A9%EB%90%98%EB%8A%94-%EA%B0%9D%EC%B2%B4"><span class="nav-text">5 테이블 외에 자주 사용되는 객체</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%82%AC%EC%A0%84"><span class="nav-text">5.1 데이터 사전</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-1-USER-%EC%A0%91%EB%91%90%EC%96%B4%EB%A5%BC-%EA%B0%80%EC%A7%84-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%82%AC%EC%A0%84"><span class="nav-text">5.1.1 USER_ 접두어를 가진 데이터 사전</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-2-ALL-%EC%A0%91%EB%91%90%EC%96%B4%EB%A5%BC-%EA%B0%80%EC%A7%84-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%82%AC%EC%A0%84"><span class="nav-text">5.1.2 ALL_ 접두어를 가진 데이터 사전</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-3-DBA-%EC%A0%91%EB%91%90%EC%96%B4%EB%A5%BC-%EA%B0%80%EC%A7%84-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%82%AC%EC%A0%84"><span class="nav-text">5.1.3 DBA_ 접두어를 가진 데이터 사전</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-Index"><span class="nav-text">5.2 Index</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-View"><span class="nav-text">5.3 View</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-4-%EC%8B%9C%ED%80%80%EC%8A%A4"><span class="nav-text">5.4 시퀀스</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%EC%98%A4%EB%9D%BC%ED%81%B4-%EC%A3%BC%EC%9A%94-%EB%82%B4%EC%9E%A5%ED%95%A8%EC%88%98"><span class="nav-text">6. 오라클 주요 내장함수</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-%EB%AC%B8%EC%9E%90%EC%97%B4-%EA%B4%80%EB%A0%A8"><span class="nav-text">6.1 문자열 관련</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-%EB%82%A0%EC%A7%9C-%EA%B4%80%EB%A0%A8"><span class="nav-text">6.2 날짜 관련</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-%EC%88%98%ED%95%99-%EA%B4%80%EB%A0%A8"><span class="nav-text">6.3 수학 관련</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-4-%EB%85%BC%EB%A6%AC-%EA%B4%80%EB%A0%A8"><span class="nav-text">6.4 논리 관련</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-%EB%B0%B1%EC%97%85%EA%B3%BC-%EB%B3%B5%EC%9B%90"><span class="nav-text">7. 백업과 복원</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

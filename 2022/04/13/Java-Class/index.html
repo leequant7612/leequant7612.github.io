@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leequant7612.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1. 제어자클래스, 필드, 메서드, 생성자 등에게 특징을 부여하는 문법 1.1 Access modifier private &lt; package(생략가능) &lt; protected &lt; public  private: 자기 클래스내에서만 접근 가능 package : 같은 패키지 안에서만 접근 가능 protected : 다른 패키지일지라도 상속관계가 있으">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java Class">
+<meta property="og:url" content="http://leequant7612.github.io/2022/04/13/Java-Class/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1. 제어자클래스, 필드, 메서드, 생성자 등에게 특징을 부여하는 문법 1.1 Access modifier private &lt; package(생략가능) &lt; protected &lt; public  private: 자기 클래스내에서만 접근 가능 package : 같은 패키지 안에서만 접근 가능 protected : 다른 패키지일지라도 상속관계가 있으">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-04-13T01:48:10.000Z">
+<meta property="article:modified_time" content="2022-04-13T01:59:26.968Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Class">
+<meta property="article:tag" content="Modifier">
+<meta property="article:tag" content="Interface">
+<meta property="article:tag" content="Generic">
+<meta property="article:tag" content="Abstract">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://leequant7612.github.io/2022/04/13/Java-Class/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Java Class | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://leequant7612.github.io/2022/04/13/Java-Class/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java Class
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-13 10:48:10 / Modified: 10:59:26" itemprop="dateCreated datePublished" datetime="2022-04-13T10:48:10+09:00">2022-04-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Programming-Language/" itemprop="url" rel="index"><span itemprop="name">Programming Language</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Programming-Language/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-제어자"><a href="#1-제어자" class="headerlink" title="1. 제어자"></a>1. 제어자</h1><p>클래스, 필드, 메서드, 생성자 등에게 특징을 부여하는 문법</p>
+<h2 id="1-1-Access-modifier"><a href="#1-1-Access-modifier" class="headerlink" title="1.1 Access modifier"></a>1.1 Access modifier</h2><ul>
+<li>private &lt; package(생략가능) &lt; protected &lt; public <ul>
+<li>private: 자기 클래스내에서만 접근 가능</li>
+<li>package : 같은 패키지 안에서만 접근 가능</li>
+<li>protected : 다른 패키지일지라도 상속관계가 있으면 접근 가능</li>
+<li>public : 어디서나 접근 가능</li>
+</ul>
+</li>
+<li>대상 &#x3D; {필드, 메서드, 생성자} + 클래스<ul>
+<li>클래스의 경우 <code>package</code>와 <code>public</code>을 구분해서 쓴다.</li>
+<li>다른 패키지에서 임포트를 허용할 클래스라면, <code>public</code>을 써야만한다.</li>
+</ul>
+</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="1-2-others"><a href="#1-2-others" class="headerlink" title="1.2 others"></a>1.2 others</h2><ul>
+<li><code>static</code> : 멤버를 객체가 아닌 클래스에 종속되게 함<ul>
+<li>대상 &#x3D; {필드, 메서드}</li>
+</ul>
+</li>
+<li><code>final</code> : 최종<ul>
+<li>대상 &#x3D; {필드, 메서드, 지역변수, 클래스}<ul>
+<li>변수의 경우 한번 대입된 값을 수정하지 못함 (상수화)<ul>
+<li>지역변수 final의 경우, 불변성을 위해 씀</li>
+<li><code>final</code></li>
+</ul>
+</li>
+<li>메서드의 경우 오버라이딩 금지</li>
+<li>클래스의 경우 상속 금지</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>abstract</code><ul>
+<li>대상 &#x3D; {클래스, 메서드}</li>
+</ul>
+</li>
+</ul>
+<h1 id="2-Class"><a href="#2-Class" class="headerlink" title="2. Class"></a>2. <code>Class</code></h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">접근지정자 [modifier] class 클래스명 [extends 상속클래스] [implements 안터페이스[, 인터페이스<span class="number">2</span>, ...]]&#123;</span><br><span class="line">    접근지정자 자료형 필드명;</span><br><span class="line">    접근지정자 <span class="keyword">static</span> 자료형 필드명;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>클래스의 구성</p>
+<ul>
+<li><p>클래스 헤더</p>
+</li>
+<li><p>멤버 필드</p>
+<ul>
+<li><p>인스턴스 멤버 필드</p>
+</li>
+<li><p>스태틱 멤버 필드</p>
+<ul>
+<li><p>상수</p>
+<p><code>public static final</code></p>
+</li>
+<li><p>싱글톤 디자인</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="type">SingleTone</span> <span class="variable">single</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SingleTone</span>();</span><br><span class="line"><span class="keyword">private</span> <span class="title function_">SingleTone</span><span class="params">()</span> &#123;&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> SingleTone <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> single;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>스태틱 블록 : 클래스 로드 시점에 실행되는 블록, 주로 정적필드 초기화용으로 씀</p>
+</li>
+<li><p>생성자</p>
+</li>
+<li><p>멤버 메서드</p>
+<ul>
+<li>인스턴스 메서드 : 스태틱 멤버와 인스턴스 멤버에 접근이 가능함</li>
+<li>스태틱 메서드 : 스태틱 멤버만 접근 가능</li>
+</ul>
+</li>
+<li><p>이너클래스</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-1-필드-vs-지역변수"><a href="#2-1-필드-vs-지역변수" class="headerlink" title="2.1 필드 vs 지역변수"></a>2.1 필드 vs 지역변수</h2><ul>
+<li>필드<ul>
+<li>클래스에 포함된 변수</li>
+<li>인스턴스 변수는 힙영역에 객체의 내부에 저장된다</li>
+<li>자동 초기화</li>
+</ul>
+</li>
+<li>지역변수<ul>
+<li>메서드에 포함된 변수</li>
+<li>지역변수는 스택영역에 저장되고 unreachable 상태가 되면 자동으로 삭제됨</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-2-오버로딩-오버라이딩"><a href="#2-2-오버로딩-오버라이딩" class="headerlink" title="2.2 오버로딩, 오버라이딩"></a>2.2 오버로딩, 오버라이딩</h2><ul>
+<li><p>오버로딩 : 같은 메서드명, 다른 동작</p>
+<ul>
+<li>메서드 시그니처가 identifier가 된다.<ul>
+<li>메서드명, 인자수, 인자타입</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>오버라이딩 : 상속받은 메서드를 재정의</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> <span class="keyword">extends</span> <span class="title class_">B</span> &#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="type">int</span> <span class="title function_">func</span><span class="params">()</span> &#123;</span><br><span class="line">		...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="2-3-상속"><a href="#2-3-상속" class="headerlink" title="2.3 상속"></a>2.3 상속</h2><ul>
+<li><p>상속하는 이유</p>
+<ul>
+<li><p>코드 중복성 제거</p>
+</li>
+<li><p>다형성(polymorphism)</p>
+<ul>
+<li><p>농장에는 <code>딸기</code>, <code>바나나</code>, <code>귤</code> 등 다양한 종류의 과일이 있다.</p>
+</li>
+<li><p>다양한 종류의 객체들을<code>과일</code> 배열에 담을 수 있다. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">과일[] fruits = &#123;딸기<span class="number">1</span>, 딸기<span class="number">2</span>, 바나나<span class="number">1</span>&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>Fruit strawberry1 = new Strawberry();</code></p>
+<ul>
+<li>이는 유효한 다형적 표현이다. (업캐스팅)</li>
+<li><code>Strawberry</code>에서 추가한 멤버는 접근이 안된다.</li>
+<li>대신, <code>Strawberry</code>에서 오버라이딩한 메소드는 접근이 된다.<ul>
+<li>이게 추상클래스, 인터페이스에서 선언만 하는 근본적 이유</li>
+</ul>
+</li>
+<li>업캐스팅하며 생성된 객체라면 원래 상태로 다운캐스팅 가능</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>메모리 구조</p>
+<ul>
+<li>자식의 생성자에선 <ul>
+<li>디폴트로 <code>super()</code>를 먼저 호출한 후에</li>
+<li>생성자 내부가 실행된다.</li>
+</ul>
+</li>
+<li>자식 객체 내부에, 부모 객체가 있는 구조이다.</li>
+</ul>
+</li>
+<li><p>오버라이딩</p>
+<ul>
+<li>부모의 접근 지정자에 따른 자식 접근 지정자<ul>
+<li><strong>자식은 접근 자격을 너그럽게 해줄 순 있어도 엄격하게 할 순 없다.</strong><ul>
+<li>부모가 public이면 자식도 public이여야함</li>
+<li>부모가 private면 자식은 아무거나 해도 됨</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-4-추상클래스-amp-인터페이스"><a href="#2-4-추상클래스-amp-인터페이스" class="headerlink" title="2.4 추상클래스 &amp; 인터페이스"></a>2.4 추상클래스 &amp; 인터페이스</h2><h3 id="2-4-1-추상클래스"><a href="#2-4-1-추상클래스" class="headerlink" title="2.4.1 추상클래스"></a>2.4.1 추상클래스</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AClass</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>불완전한 설계도<ul>
+<li>개발자에게 명시하는 기능을 한다.</li>
+</ul>
+</li>
+<li>추상메소드를 포함한 클래스이다.<ul>
+<li>추상메소드 없으면 굳이 abstract 쓸 이유 없음</li>
+<li><code>abstract int func(int a, int b);</code></li>
+<li>상속받은 클래스에게 오버라이딩을 해야한다는 의미가 전달됨 (구현 안하고 추상메소드 호출 시 에러)</li>
+</ul>
+</li>
+<li>특징<ul>
+<li>인스턴스화 불가능, 대신 업캐스팅은 가능</li>
+<li>내부에 추상 메소드를 구현 가능</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-4-2-인터페이스"><a href="#2-4-2-인터페이스" class="headerlink" title="2.4.2 인터페이스"></a>2.4.2 인터페이스</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title class_">A</span> &#123;</span><br><span class="line">	<span class="comment">// 필드</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">x</span> <span class="operator">=</span> <span class="number">5</span>;</span><br><span class="line">	<span class="comment">// 추상메소드</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">abstract</span> <span class="type">int</span> <span class="title function_">func</span><span class="params">()</span>;</span><br><span class="line">	<span class="comment">// 디폴트메소드</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">default</span> <span class="type">int</span> <span class="title function_">func2</span><span class="params">()</span> &#123;</span><br><span class="line">		...</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 정적메소드</span></span><br><span class="line">	(<span class="keyword">public</span> | <span class="keyword">protected</span> | <span class="keyword">package</span>) <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">func3</span><span class="params">()</span> &#123;</span><br><span class="line">		...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>내부의 모든 필드가 public static final로 정의된다.</p>
+<blockquote>
+<p>public static final 생략해도 컴파일러가 붙여주긴 하지만, 그냥 의존하지 말고 직접 쓰길 바람</p>
+</blockquote>
+</li>
+<li><p>모든 메서드는 public abstract로 정의된다.</p>
+<blockquote>
+<p>자바 8부턴 디폴트, 정적 메소드 추가</p>
+</blockquote>
+</li>
+<li><p>다중 상속이 허용된다.</p>
+<ul>
+<li>구현부가 없으니 메소드 충돌날 일이 없다</li>
+</ul>
+</li>
+<li><p>추상메소드를 구현안하면 문법오류가 발생한다.</p>
+<blockquote>
+<p>당연히 자식에서 오버라이딩할 때 메소드의 Access modifier는 public일 수 밖에 없다.</p>
+</blockquote>
+</li>
+<li><p>디폴트메소드의 동기</p>
+<ul>
+<li>인터페이스를 상속한 클래스가 100개 있다고 해보자.</li>
+<li>업데이트를 하면서 100개의 클래스가 공유하는 메소드를 추가하고 싶다고 생각하자.</li>
+<li>그러면 2가지 선택지가 있다.<ul>
+<li>인터페이스를 추상클래스로 바꾸고, … (100개의 클래스가 이미 다른 추상클래스들을 상속하고 있다면 ㅅㄱ)</li>
+<li>100개의 클래스에 메소드를 복붙한다. (중복)</li>
+</ul>
+</li>
+<li>이러한 문제를 해결하려면 인터페이스에 디폴트메소드를 추가하자.<ul>
+<li><code>인터페이스명.super.디폴트메소드명()</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>정적메소드</p>
+<ul>
+<li><code>인터페이스명.디폴트메소드명()</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="2-4-2-1-자식-클래스를-직접-정의해-A타입의-객체-생성"><a href="#2-4-2-1-자식-클래스를-직접-정의해-A타입의-객체-생성" class="headerlink" title="2.4.2.1 자식 클래스를 직접 정의해 A타입의 객체 생성"></a>2.4.2.1 자식 클래스를 직접 정의해 <code>A</code>타입의 객체 생성</h4><p>똑같은 유형을 가진 여러개의 객체를 생성해야할 때 유리함</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> <span class="keyword">implements</span> <span class="title class_">A</span> &#123;</span><br><span class="line"> 	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">AFunc</span><span class="params">()</span> &#123; ... &#125;; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">A</span> <span class="variable">a</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">B</span>(); </span><br><span class="line"><span class="comment">// 업캐스팅 코드로 생성하면 B클래스를 C클래스로 교체해도 코드 고칠 일이 없음!!</span></span><br><span class="line"><span class="comment">// B클래스로 생성하고 B클래스에서 추가한 메소드에 의존하게 되면 애플리케이션 코드 유지보수 어려움!!</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-2-2-익명이너클래스를-통해-A타입의-객체-생성"><a href="#2-4-2-2-익명이너클래스를-통해-A타입의-객체-생성" class="headerlink" title="2.4.2.2 익명이너클래스를 통해 A타입의 객체 생성"></a>2.4.2.2 익명이너클래스를 통해 <code>A</code>타입의 객체 생성</h4><p>딱 1개의 고유한 객체를 생성할 때 유리함</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">A</span> <span class="variable">a</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">A</span>() &#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">AFunc</span><span class="params">()</span> &#123; ... &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-제네릭"><a href="#3-제네릭" class="headerlink" title="3. 제네릭"></a>3. 제네릭</h1><blockquote>
+<p>객체를 언급할 떄, 타입 &#x3D; 클래스 는 똑같은 말임</p>
+</blockquote>
+<p>다양한 종류의 객체를 <strong>안정적으로</strong>(Type conversion 없이), 중복없이(오버로딩 없이) 다룰 수 있게 해준다.</p>
+<ul>
+<li>동기<ul>
+<li>다양한 인터페이스와 추상 클래스가 있다.</li>
+<li>그로 인해, 자바엔 다양한 클래스가 존재하게 된다.</li>
+<li>생성자, 메서드 등 오버로딩 해야할 게 너무 많아진다</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-1-제네릭-클래스"><a href="#3-1-제네릭-클래스" class="headerlink" title="3.1 제네릭 클래스"></a>3.1 제네릭 클래스</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyType</span>&lt;T1, T2&gt; &#123; <span class="comment">// interface도 가능</span></span><br><span class="line">	<span class="keyword">private</span> T1 t;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">get</span><span class="params">(T2)</span> &#123;&#125;</span><br><span class="line">    <span class="comment">// ? : 와일드카드; 리스트 중에서도 AAAAA를 상속받은 애를 원소로 갖는 리스트만!</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">f</span><span class="params">(List&lt;? extends AAAAA&gt; x)</span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>클래스 내에서 &lt;제네릭타입&gt;는 이미 존재하는 클래스처럼 쓰인다.</strong></p>
+<p><strong>물론 객체 생성 시점에서 타입클래스가 정해진다.</strong></p>
+<p>제네릭 클래스를 활용하면 다양한 객체를 저장하고 관리하는 컨테이너를 만들 때 유용하다.</p>
+<ul>
+<li><code>T</code> : 타입</li>
+<li><code>K</code> : 키</li>
+<li><code>V</code> : 값</li>
+<li><code>N</code> : 숫자</li>
+<li><code>E</code> : 원소</li>
+</ul>
+<p>static 멤버는 타입파라미터 쓸 수 없다.</p>
+<blockquote>
+<p>static 제네릭 메서드는 만들 수 있긴 하다. </p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">NonGeneric</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Object field;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(Object field)</span>&#123;</span><br><span class="line">    	<span class="built_in">this</span>.field=field;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">get</span><span class="params">()</span>&#123;</span><br><span class="line">    	<span class="keyword">return</span> field;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		  <span class="type">NonGeneric</span> <span class="variable">ng</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NonGeneric</span>();</span><br><span class="line">		  ng.add(<span class="string">&quot;NonGeneric타입&quot;</span>);</span><br><span class="line">		  <span class="type">String</span> <span class="variable">value</span> <span class="operator">=</span> (String)ng.get();<span class="comment">//Object에서 String으로 강제 형변환해야함        </span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Generic</span>&lt;T&gt;&#123;</span><br><span class="line">    <span class="keyword">private</span> T field;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(T field)</span>&#123;</span><br><span class="line">    	<span class="built_in">this</span>.field=field;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> T <span class="title function_">get</span><span class="params">()</span>&#123;</span><br><span class="line">    	<span class="keyword">return</span> field;</span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line">    <span class="comment">//아래는 제너릭 메소드 이때 T는 Generic&lt;T&gt;의  T와 무관하다</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; T <span class="title function_">genericMethod</span><span class="params">(T param)</span>&#123;		</span><br><span class="line">    	<span class="keyword">return</span> param;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;E&gt; E <span class="title function_">genericStaticMethod</span><span class="params">(E param)</span>&#123;		</span><br><span class="line">    	<span class="keyword">return</span> param;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		  Generic&lt;String&gt; ge = <span class="keyword">new</span> <span class="title class_">Generic</span>&lt;&gt;();</span><br><span class="line">		  ge.add(<span class="string">&quot;Generic&quot;</span>);</span><br><span class="line">		  String value=ge.get();<span class="comment">//형변환이 필요 없다</span></span><br><span class="line">		  System.out.println(ge.genericMethod(<span class="number">10</span>).getClass().getName());</span><br><span class="line">		  System.out.println(Generic.genericStaticMethod(<span class="literal">true</span>).getClass().getName());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-제네릭-메서드"><a href="#3-2-제네릭-메서드" class="headerlink" title="3.2 제네릭 메서드"></a>3.2 제네릭 메서드</h2><p>일반 클래스에서 제네릭 메서드를 사용할 수도 있다,</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span> &#123;   </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; T <span class="title function_">getT</span><span class="params">()</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> &lt;T1, T2&gt; T1 <span class="title function_">getT1</span><span class="params">(T2 t2)</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="keyword">void</span> <span class="title function_">setT</span><span class="params">(T t)</span> &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">--------------------------------------------</span><br><span class="line">a = A();</span><br><span class="line">A.&lt;String&gt;getT();</span><br><span class="line">a.&lt;String&gt;setT(<span class="string">&quot;abc&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-3-타입-제한"><a href="#3-3-타입-제한" class="headerlink" title="3.3 타입 제한"></a>3.3 타입 제한</h2><p><strong>타입은 객체 생성 시점에서 정해진다.</strong></p>
+<p>그러므로, <code>Object</code>에 없는 멤버를 참조하면 컴파일 에러가 발생한다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="keyword">void</span> <span class="title function_">setT</span><span class="params">(T t)</span> &#123;</span><br><span class="line">    System.out(<span class="string">&quot;입력 인자의 길이 : &quot;</span> + t.length());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>또한, 컨테이너로서 과일에 관련한 객체만 관리하고 싶을 수 있다.</p>
+<p>동물은 못넣게 하려면 제네릭타입에 제한을 줘야한다.</p>
+<ul>
+<li>한정된 타입 파라미터(Bounded Type Parameter)<ul>
+<li>&lt;T extends 최상위 타입&gt;</li>
+<li>&lt;T super 최하위 타입&gt;</li>
+</ul>
+</li>
+<li>와일드카드 타입 : 모든 타입 s.t.<ul>
+<li><code>&lt;?&gt;</code></li>
+<li><code>&lt;? extends 최상위 타입&gt;</code></li>
+<li><code>&lt;? super 최하위 타입&gt;</code></li>
+</ul>
+</li>
+</ul>
+<p><code>&lt;?&gt;</code> 와 <code>Object</code>는 다르다</p>
+<blockquote>
+<p>Integer는 Object이지만, List<Integer>는 Obejct가 아님</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">class MyType&lt;T extends Fruit&gt; &#123; // interface도 가능</span><br><span class="line">	private T t;</span><br><span class="line">	public T get() &#123;</span><br><span class="line">		return t;</span><br><span class="line">	&#125;</span><br><span class="line">	public void set(T t) &#123;</span><br><span class="line">		this.t = t;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class A &#123;</span><br><span class="line">	public &lt;T extends SpecificType&gt; void set(T t) &#123;</span><br><span class="line">		...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-4-상속"><a href="#3-4-상속" class="headerlink" title="3.4 상속"></a>3.4 상속</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Parent</span>&lt;K, V&gt; &#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 제네릭타입 똑같을 때</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Child</span>&lt;K, V&gt; <span class="keyword">extends</span> <span class="title class_">Parent</span>&lt;K, V&gt; &#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 제네릭타입 추가할 때</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">ChildPlus</span>&lt;K, V, T&gt; <span class="keyword">extends</span> <span class="title class_">Parent</span>&lt;K, V&gt; &#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Class/" rel="tag"># Class</a>
+              <a href="/tags/Modifier/" rel="tag"># Modifier</a>
+              <a href="/tags/Interface/" rel="tag"># Interface</a>
+              <a href="/tags/Generic/" rel="tag"># Generic</a>
+              <a href="/tags/Abstract/" rel="tag"># Abstract</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/13/JDK-Basic/" rel="prev" title="JDK Basic">
+      <i class="fa fa-chevron-left"></i> JDK Basic
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/13/Java-Thread/" rel="next" title="Java Thread">
+      Java Thread <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%EC%A0%9C%EC%96%B4%EC%9E%90"><span class="nav-text">1. 제어자</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-Access-modifier"><span class="nav-text">1.1 Access modifier</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-others"><span class="nav-text">1.2 others</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Class"><span class="nav-text">2. Class</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%ED%95%84%EB%93%9C-vs-%EC%A7%80%EC%97%AD%EB%B3%80%EC%88%98"><span class="nav-text">2.1 필드 vs 지역변수</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%EC%98%A4%EB%B2%84%EB%A1%9C%EB%94%A9-%EC%98%A4%EB%B2%84%EB%9D%BC%EC%9D%B4%EB%94%A9"><span class="nav-text">2.2 오버로딩, 오버라이딩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%EC%83%81%EC%86%8D"><span class="nav-text">2.3 상속</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-%EC%B6%94%EC%83%81%ED%81%B4%EB%9E%98%EC%8A%A4-amp-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4"><span class="nav-text">2.4 추상클래스 &amp; 인터페이스</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-1-%EC%B6%94%EC%83%81%ED%81%B4%EB%9E%98%EC%8A%A4"><span class="nav-text">2.4.1 추상클래스</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-2-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4"><span class="nav-text">2.4.2 인터페이스</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-2-1-%EC%9E%90%EC%8B%9D-%ED%81%B4%EB%9E%98%EC%8A%A4%EB%A5%BC-%EC%A7%81%EC%A0%91-%EC%A0%95%EC%9D%98%ED%95%B4-A%ED%83%80%EC%9E%85%EC%9D%98-%EA%B0%9D%EC%B2%B4-%EC%83%9D%EC%84%B1"><span class="nav-text">2.4.2.1 자식 클래스를 직접 정의해 A타입의 객체 생성</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-2-2-%EC%9D%B5%EB%AA%85%EC%9D%B4%EB%84%88%ED%81%B4%EB%9E%98%EC%8A%A4%EB%A5%BC-%ED%86%B5%ED%95%B4-A%ED%83%80%EC%9E%85%EC%9D%98-%EA%B0%9D%EC%B2%B4-%EC%83%9D%EC%84%B1"><span class="nav-text">2.4.2.2 익명이너클래스를 통해 A타입의 객체 생성</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%EC%A0%9C%EB%84%A4%EB%A6%AD"><span class="nav-text">3. 제네릭</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%EC%A0%9C%EB%84%A4%EB%A6%AD-%ED%81%B4%EB%9E%98%EC%8A%A4"><span class="nav-text">3.1 제네릭 클래스</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%EC%A0%9C%EB%84%A4%EB%A6%AD-%EB%A9%94%EC%84%9C%EB%93%9C"><span class="nav-text">3.2 제네릭 메서드</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-%ED%83%80%EC%9E%85-%EC%A0%9C%ED%95%9C"><span class="nav-text">3.3 타입 제한</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-%EC%83%81%EC%86%8D"><span class="nav-text">3.4 상속</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leequant7612.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1. HDFS  네트워크로 연결된 머신들의 스토리지들을 관리하는 시스템">
+<meta property="og:type" content="article">
+<meta property="og:title" content="03 HDFS">
+<meta property="og:url" content="http://leequant7612.github.io/2022/04/13/03-HDFS/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1. HDFS  네트워크로 연결된 머신들의 스토리지들을 관리하는 시스템">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/03-HDFS/hdfs.png">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/03-HDFS/read2.png">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/03-HDFS/write2.png">
+<meta property="article:published_time" content="2022-04-13T02:38:03.000Z">
+<meta property="article:modified_time" content="2022-04-13T02:40:34.665Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="HDFS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://leequant7612.github.io/2022/04/13/03-HDFS/hdfs.png">
+
+<link rel="canonical" href="http://leequant7612.github.io/2022/04/13/03-HDFS/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>03 HDFS | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://leequant7612.github.io/2022/04/13/03-HDFS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          03 HDFS
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-13 11:38:03 / Modified: 11:40:34" itemprop="dateCreated datePublished" datetime="2022-04-13T11:38:03+09:00">2022-04-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop-ecosystem/" itemprop="url" rel="index"><span itemprop="name">Hadoop ecosystem</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop-ecosystem/HDFS/" itemprop="url" rel="index"><span itemprop="name">HDFS</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-HDFS"><a href="#1-HDFS" class="headerlink" title="1. HDFS"></a>1. HDFS</h1><img src="/2022/04/13/03-HDFS/hdfs.png" class="">
+
+<p>네트워크로 연결된 머신들의 스토리지들을 관리하는 시스템</p>
+<span id="more"></span>
+
+<p><strong>설계 특성</strong></p>
+<ul>
+<li>매우 큰 파일을 저장할 수 있다.</li>
+<li>“전체” 데이터셋을 읽을 때 걸리는 시간이 짧다</li>
+<li>범용 하드웨어로 클러스터를 설계할 수 있다.</li>
+</ul>
+<p><strong>부적합한 분야</strong></p>
+<ul>
+<li>적은 데이터에 대한 짧은 응답 시간</li>
+<li>엄청 작은파일들의 용량이 큰 경우</li>
+</ul>
+<h1 id="2-개념"><a href="#2-개념" class="headerlink" title="2. 개념"></a>2. 개념</h1><p>##2.1 블록</p>
+<p>HDFS에서 저장되는 데이터의 단위이고 128MB가 기본값으로 지정된다.</p>
+<p>이를 통해,</p>
+<ol>
+<li>파일 하나의 크기가 단일 디스크의 용량보다 커질 수 있고</li>
+<li>fault tolerance와 availability를 제공하는데 필요한 복제를 구현하기 적합하다.</li>
+</ol>
+<p>복제는 3회로 기본값이 지정되어있다.</p>
+<h2 id="2-2-네임노드와-데이터노드"><a href="#2-2-네임노드와-데이터노드" class="headerlink" title="2.2 네임노드와 데이터노드"></a>2.2 네임노드와 데이터노드</h2><ul>
+<li>네임노드 : 관리자<ul>
+<li>파일과 디렉터리에 대한 메타데이터를 유지한다.</li>
+<li>파일의 블록들이 어느 데이터노드에 있는 지 알고있다.</li>
+<li>장애복구 기능을 갖고 있다.</li>
+</ul>
+</li>
+<li>데이터노드 : 일꾼</li>
+</ul>
+<h2 id="2-3-블록-캐싱"><a href="#2-3-블록-캐싱" class="headerlink" title="2.3 블록 캐싱"></a>2.3 블록 캐싱</h2><p>블록캐시는 데이터 노드의 메모리이다.</p>
+<p>자주 사용할 블록들을 명시적으로 캐싱할 수 있다.</p>
+<h2 id="HDFS-페더레이션-HDFS-고가용성"><a href="#HDFS-페더레이션-HDFS-고가용성" class="headerlink" title="HDFS 페더레이션, HDFS 고가용성"></a>HDFS 페더레이션, HDFS 고가용성</h2><h1 id="3-명령행-인터페이스"><a href="#3-명령행-인터페이스" class="headerlink" title="3. 명령행 인터페이스"></a>3. 명령행 인터페이스</h1><p>HDFS의 중요 속성</p>
+<ul>
+<li><code>fs.defaultFS</code> : 네임노드의 호스트</li>
+<li><code>fs.replication</code> : 블록 복제 횟수</li>
+</ul>
+<h2 id="3-1-기본적인-HDFS-연산"><a href="#3-1-기본적인-HDFS-연산" class="headerlink" title="3.1 기본적인 HDFS 연산"></a>3.1 기본적인 HDFS 연산</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">hdfs dfs -mkdir /user</span><br><span class="line">hdfs dfs -mkdir /user/hadoop</span><br><span class="line"></span><br><span class="line">// 택 일</span><br><span class="line">hadoop fs -copyFromLocal input/docs/quangle.txt hdfs://localhost/user/hadoop/quangle.txt</span><br><span class="line">hadoop fs -copyFromLocal input/docs/quangle.txt /user/hadoop/quangle.txt</span><br><span class="line">hadoop fs -copyFromLocal input/docs/quangle.txt quangle.txt</span><br></pre></td></tr></table></figure>
+
+<p>로컬 파일 <code>input/docs/quangle.txt</code>이 로컬호스트에서 실행되는 HDFS인스턴스의 <code>/user/hadoop/quangle.txt</code>로 복사된다.</p>
+<p>URI 스킴과 호스트를 생략하면 <code>fs.defaultFS</code>이 디폴트로 들어온다.</p>
+<p>상대경로도 생략하면, HDFS의 홈 디렉터리가 디폴트로 들어온다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hadoop fs -mkdir books</span><br><span class="line">hadoop fs -ls .</span><br><span class="line">hadoop fs -ls file:///</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-하둡-파일시스템"><a href="#4-하둡-파일시스템" class="headerlink" title="4. 하둡 파일시스템"></a>4. 하둡 파일시스템</h1><ul>
+<li><code>org.apache.hadoop.fs.FileSystem</code> 인터페이스를 상속받은 클래스들<ul>
+<li>&#96;&#96;org.apache.hadoop.hdfs.DistributedFileSystem&#96;<ul>
+<li>맵리듀스와 효율적으로 연동하기위해 설계됨</li>
+</ul>
+</li>
+<li><code>org.apache.hadoop.fs.LocalFileSystem</code></li>
+<li>…</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-1-org-apache-hadoop-fs-FileSystem"><a href="#4-1-org-apache-hadoop-fs-FileSystem" class="headerlink" title="4.1 org.apache.hadoop.fs.FileSystem"></a>4.1 <code>org.apache.hadoop.fs.FileSystem</code></h2><p>접근할 파일시스템에 대한 인스턴스를 얻는데 사용하는 API이다.</p>
+<ul>
+<li><code>get(uri, conf[, user])</code> : 파일시스템 인스턴스를 얻는 정적 팩토리 메서드</li>
+<li><code>open(Path f)</code> : 입력스트림 <code>FSDataInputStream</code>(<code>FSDIS</code>) 을 반환</li>
+<li><code>create(Path f)</code> : 파일의 블록크기, FSDOS의 버퍼크기, 파일의복제개수가 설정된 <code>FSDOS</code>을 반환</li>
+<li><code>getFileStatus(Path f)</code> : <code>FileStatus</code> 반환</li>
+<li><code>listStatus(Path dir)</code> : 해당하는 디렉터리의 <code>FileStatus[]</code>를 반환</li>
+<li><code>globStatus(Path pattern[, PathFilter])</code> : 특정패턴의 디렉토리의 (필터링을 한 후에)  <code>FileStatus[]</code>를 반환</li>
+<li><code>delete(Path f, boolean recurvise)</code></li>
+</ul>
+<h2 id="4-2-FSDIS"><a href="#4-2-FSDIS" class="headerlink" title="4.2 FSDIS"></a>4.2 <code>FSDIS</code></h2><p>랜덤접근을 지원하기 위해 <code>java.io.DIS</code>를 변경한 것이고 스트림의 어떤 부분이든 읽을 수 있다.</p>
+<ul>
+<li><p><code>read()</code> : 다중 스레드로 작업할 때 안전하게 읽음</p>
+<blockquote>
+<p> FSDIS는 스레드 구현이 아니고 FSDIS 인스턴스 여러개 일 때 의미하는 것임</p>
+</blockquote>
+</li>
+<li><p><code>seek(long pos)</code> : 파일 스트림 위치 변경</p>
+</li>
+<li><p><code>getPos()</code> : 스트림의 현재 위치 반환</p>
+</li>
+</ul>
+<h2 id="4-3-FSDOS"><a href="#4-3-FSDOS" class="headerlink" title="4.3 FSDOS"></a>4.3 <code>FSDOS</code></h2><ul>
+<li><code>write(...)</code> :</li>
+<li><code>progress()</code> : 데이터노드의 쓰기 진행상황을 파악</li>
+</ul>
+<p>예시코드</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// HDFSTest01.java</span></span><br><span class="line"><span class="keyword">package</span> hdfs.exam;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.conf.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.fs.FSDataOutputStream;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.fs.FileSystem;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.fs.Path;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * hdfs(하둡의 분산 파일 시스템)를 제어 - hadoop API로 제어</span></span><br><span class="line"><span class="comment"> * api를 이용하여 hdfs에 파일을 생성하는 예제</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 사용자가 정의한 경로에 텍스트 파일을 생성하는 작업</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HDFSTest01</span> &#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">		<span class="comment">// 1. hdfs를 제어하기 위해서 설정파일에 정의된 내용을 api내부에서 접근할 수 있어야 한다. </span></span><br><span class="line">		<span class="comment">// - 내부적으로 설정정보를 접근할 수 있도록 설정정보를 모델링한 객체를 생성</span></span><br><span class="line">		<span class="type">Configuration</span> <span class="variable">conf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Configuration</span>();</span><br><span class="line">		<span class="comment">// 2. hdfs를 모델링 해놓은 객체 - hdfs를 접근할 수 있도록 객체를 생성</span></span><br><span class="line">		<span class="type">FileSystem</span> <span class="variable">hdfs</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">		<span class="comment">// 3. hdfs로 출력할 수 있는 기능을 가지고 있는 출력 스트림</span></span><br><span class="line">		<span class="type">FSDataOutputStream</span> <span class="variable">hdfsout</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			hdfs = FileSystem.get(conf);</span><br><span class="line">			<span class="comment">// 4. hdfs의 경로를 인식하는 객체를 이용해서 출력할 파일이 저장될 경로를 정의</span></span><br><span class="line">			<span class="comment">// =&gt; 실행할 때 파일 경로를 명령문으로 입력받아서 사용할 수 있도록 명령행 매개변수</span></span><br><span class="line">			<span class="type">Path</span> <span class="variable">path</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Path</span>(args[<span class="number">0</span>]);</span><br><span class="line">			<span class="comment">// 5. hdfs에 파일을 저장</span></span><br><span class="line">			hdfsout = hdfs.create(path);</span><br><span class="line">			<span class="comment">// fw = new FileWriter(&quot;파일명&quot;)과 동일작업</span></span><br><span class="line">			hdfsout.writeUTF(args[<span class="number">1</span>]); <span class="comment">// 명령행 매개변수로 입력한 문자열을 파일에 쓰기</span></span><br><span class="line">		&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">			e.printStackTrace(); </span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-데이터-흐름"><a href="#5-데이터-흐름" class="headerlink" title="5. 데이터 흐름"></a>5. 데이터 흐름</h1><h2 id="5-1-읽기"><a href="#5-1-읽기" class="headerlink" title="5.1 읽기"></a>5.1 읽기</h2><img src="/2022/04/13/03-HDFS/read2.png" class="">
+
+<h2 id="5-2-쓰기"><a href="#5-2-쓰기" class="headerlink" title="5.2 쓰기"></a>5.2 쓰기</h2><img src="/2022/04/13/03-HDFS/write2.png" class="">
+
+<h2 id="distcp로-병렬복사하기"><a href="#distcp로-병렬복사하기" class="headerlink" title="distcp로 병렬복사하기"></a>distcp로 병렬복사하기</h2><p>HDFS에 있는 다량의 데이터를 병렬로 복사하는 프로그램이다.</p>
+<p>distcp는 맵리듀스 잡으로 구현되어있고 그 중에서도 맵태스크를 이용하여 복사작업을 한다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hadoop distcp file1(or dir1) file2(or dir2)</span><br><span class="line">	-overwrite // 덮어쓰기</span><br><span class="line">	-update	// 다른것만 복사</span><br><span class="line">	-m	// 맵퍼 병렬 숫자 (디폴트 20)</span><br><span class="line">	-p // 파일에 대한 속성정보 보전</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/HDFS/" rel="tag"># HDFS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/13/02-MapReduce/" rel="prev" title="02 MapReduce">
+      <i class="fa fa-chevron-left"></i> 02 MapReduce
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/13/04-MapReduceOnYARN/" rel="next" title="04 MapReduceOnYARN">
+      04 MapReduceOnYARN <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-HDFS"><span class="nav-text">1. HDFS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%EA%B0%9C%EB%85%90"><span class="nav-text">2. 개념</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%EB%84%A4%EC%9E%84%EB%85%B8%EB%93%9C%EC%99%80-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%85%B8%EB%93%9C"><span class="nav-text">2.2 네임노드와 데이터노드</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%EB%B8%94%EB%A1%9D-%EC%BA%90%EC%8B%B1"><span class="nav-text">2.3 블록 캐싱</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HDFS-%ED%8E%98%EB%8D%94%EB%A0%88%EC%9D%B4%EC%85%98-HDFS-%EA%B3%A0%EA%B0%80%EC%9A%A9%EC%84%B1"><span class="nav-text">HDFS 페더레이션, HDFS 고가용성</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%EB%AA%85%EB%A0%B9%ED%96%89-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4"><span class="nav-text">3. 명령행 인터페이스</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%EA%B8%B0%EB%B3%B8%EC%A0%81%EC%9D%B8-HDFS-%EC%97%B0%EC%82%B0"><span class="nav-text">3.1 기본적인 HDFS 연산</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%ED%95%98%EB%91%A1-%ED%8C%8C%EC%9D%BC%EC%8B%9C%EC%8A%A4%ED%85%9C"><span class="nav-text">4. 하둡 파일시스템</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-org-apache-hadoop-fs-FileSystem"><span class="nav-text">4.1 org.apache.hadoop.fs.FileSystem</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-FSDIS"><span class="nav-text">4.2 FSDIS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-FSDOS"><span class="nav-text">4.3 FSDOS</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%EB%8D%B0%EC%9D%B4%ED%84%B0-%ED%9D%90%EB%A6%84"><span class="nav-text">5. 데이터 흐름</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-%EC%9D%BD%EA%B8%B0"><span class="nav-text">5.1 읽기</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-%EC%93%B0%EA%B8%B0"><span class="nav-text">5.2 쓰기</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#distcp%EB%A1%9C-%EB%B3%91%EB%A0%AC%EB%B3%B5%EC%82%AC%ED%95%98%EA%B8%B0"><span class="nav-text">distcp로 병렬복사하기</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

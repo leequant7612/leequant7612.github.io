@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leequant7612.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="04 MapReduceOnYARN랑 내용이 많이 겹치긴 하는데 컴바인 설명도 포함되어있어서 살린다. 1. 맵리듀스맵리듀스는 데이터 처리를 위한 프로그래밍 모델이며, 다양한 언어로 작성될 수 있다.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="02 MapReduce">
+<meta property="og:url" content="http://leequant7612.github.io/2022/04/13/02-MapReduce/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="04 MapReduceOnYARN랑 내용이 많이 겹치긴 하는데 컴바인 설명도 포함되어있어서 살린다. 1. 맵리듀스맵리듀스는 데이터 처리를 위한 프로그래밍 모델이며, 다양한 언어로 작성될 수 있다.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/02-MapReduce/image-20220312140626389.png">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/02-MapReduce/image-20220312163412946.png">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/02-MapReduce/image-20220312165544759.png">
+<meta property="og:image" content="http://leequant7612.github.io/2022/04/13/02-MapReduce/image-20220312165634723.png">
+<meta property="article:published_time" content="2022-04-13T02:32:58.000Z">
+<meta property="article:modified_time" content="2022-04-13T02:50:39.390Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="MapReduce">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://leequant7612.github.io/2022/04/13/02-MapReduce/image-20220312140626389.png">
+
+<link rel="canonical" href="http://leequant7612.github.io/2022/04/13/02-MapReduce/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>02 MapReduce | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://leequant7612.github.io/2022/04/13/02-MapReduce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          02 MapReduce
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-13 11:32:58 / Modified: 11:50:39" itemprop="dateCreated datePublished" datetime="2022-04-13T11:32:58+09:00">2022-04-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop-ecosystem/" itemprop="url" rel="index"><span itemprop="name">Hadoop ecosystem</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hadoop-ecosystem/MapReduce/" itemprop="url" rel="index"><span itemprop="name">MapReduce</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a href="../04-MapReduceOnYarn">04 MapReduceOnYARN</a>랑 내용이 많이 겹치긴 하는데 컴바인 설명도 포함되어있어서 살린다.</p>
+<h1 id="1-맵리듀스"><a href="#1-맵리듀스" class="headerlink" title="1. 맵리듀스"></a>1. 맵리듀스</h1><p>맵리듀스는 데이터 처리를 위한 프로그래밍 모델이며, 다양한 언어로 작성될 수 있다.</p>
+<img src="/2022/04/13/02-MapReduce/image-20220312140626389.png" class="">
+
+<span id="more"></span>
+
+<ol>
+<li><p><code>Mapper</code></p>
+<ul>
+<li><code>map</code> 함수는 (key, value)를 input으로 받는다.</li>
+<li>Reduce 함수를 위한 전처리를 수행해, 리듀스를 위한 (key, value)를 뱉는다.</li>
+</ul>
+<p><code>shuffle</code> : 자동으로 맵리듀스 프레임워크가 키를 기준으로 값들을 정렬하고 그룹화한다.</p>
+</li>
+<li><p><code>Reducer</code></p>
+<ul>
+<li><code>reduce</code> 함수는 (key, value<list>)를 input으로 받는다.</li>
+<li>리스트를  통해 원하는 값을 추출한다.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.LongWritable;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Mapper;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MaxTemperatureMapper</span></span><br><span class="line">	<span class="keyword">extends</span> <span class="title class_">Mapper</span>&lt;LongWritable, Text, Text, IntWritable&gt; &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">MISSING</span> <span class="operator">=</span> <span class="number">9999</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">map</span><span class="params">(LongWritable key, Text value, Context context)</span></span><br><span class="line">		<span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">String</span> <span class="variable">line</span> <span class="operator">=</span> value.toString();</span><br><span class="line">        <span class="type">String</span> <span class="variable">year</span> <span class="operator">=</span> line.substring(<span class="number">15</span>, <span class="number">19</span>);</span><br><span class="line">        <span class="type">int</span> airTemperature;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (line.charAt(<span class="number">87</span>) == <span class="string">&#x27;+&#x27;</span>) &#123; <span class="comment">// parseInt doesn&#x27;t like leading plus signs</span></span><br><span class="line">            airTemperature = Integer.parseInt(line.substring(<span class="number">88</span>, <span class="number">92</span>));</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            airTemperature = Integer.parseInt(line.substring(<span class="number">87</span>, <span class="number">92</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">String</span> <span class="variable">quality</span> <span class="operator">=</span> line.substring(<span class="number">92</span>, <span class="number">93</span>);</span><br><span class="line">        <span class="keyword">if</span> (airTemperature != MISSING &amp;&amp; quality.matches(<span class="string">&quot;[01459]&quot;</span>)) &#123;</span><br><span class="line">            context.write(<span class="keyword">new</span> <span class="title class_">Text</span>(year), <span class="keyword">new</span> <span class="title class_">IntWritable</span>(airTemperature));</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>제네릭 클래스인 <code>Mapper&lt;LongWritable, Text, Text, IntWritable&gt;</code>는 다음을 암시한다.</p>
+<ul>
+<li>input key : <code>LongWritable</code> 객체</li>
+<li>input value: <code>LongWritable</code> 객체</li>
+<li>output key : <code>Text</code> 객체</li>
+<li>output value : <code>IntWritable</code> 객체</li>
+</ul>
+<blockquote>
+<p>하둡은 최적화된 네트워크 직렬화를 위해 자체적으로 기본 타입 셋을 <code>org.apache.hadoop.io</code>에서 제공</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Reducer;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MaxTemperatureReducer</span></span><br><span class="line">	<span class="keyword">extends</span> <span class="title class_">Reducer</span>&lt;Text, IntWritable, Text, IntWritable&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">reduce</span><span class="params">(Text key, Iterable&lt;IntWritable&gt; values, Context context)</span></span><br><span class="line">		<span class="keyword">throws</span> IOException, InterruptedException &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> <span class="variable">maxValue</span> <span class="operator">=</span> Integer.MIN_VALUE;</span><br><span class="line">		<span class="keyword">for</span> (IntWritable value : values) &#123;</span><br><span class="line">			maxValue = Math.max(maxValue, value.get());</span><br><span class="line">		&#125;</span><br><span class="line">		context.write(key, <span class="keyword">new</span> <span class="title class_">IntWritable</span>(maxValue));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>MapReduce를 실행하는 application 코드를 보자.</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.hadoop.fs.Path;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Job;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileInputFormat;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MaxTemperature</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">		<span class="keyword">if</span> (args.length != <span class="number">2</span>) &#123;</span><br><span class="line">			System.err.println(<span class="string">&quot;Usage: MaxTemperature &lt;input path&gt; &lt;output path&gt;&quot;</span>);</span><br><span class="line">			System.exit(-<span class="number">1</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 잡을 실행할 코드를 JAR로 묶어서 클러스터에 배포한다.</span></span><br><span class="line">        <span class="comment">// 1. JAR 파일의 이름을 명시적으로 지정하는 방법</span></span><br><span class="line">        <span class="comment">// 2, setJarByClass에 클래스를 입력하기: 입력된 클래스와 연관된 JAR 파일을 할당시킴 </span></span><br><span class="line">        <span class="type">Job</span> <span class="variable">job</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Job</span>();</span><br><span class="line">        job.setJarByClass(MaxTemperature.class);</span><br><span class="line">        job.setJobName(<span class="string">&quot;Max temperature&quot;</span>);</span><br><span class="line"></span><br><span class="line">        FileInputFormat.addInputPath(job, <span class="keyword">new</span> <span class="title class_">Path</span>(args[<span class="number">0</span>]));</span><br><span class="line">        FileOutputFormat.setOutputPath(job, <span class="keyword">new</span> <span class="title class_">Path</span>(args[<span class="number">1</span>]));</span><br><span class="line"></span><br><span class="line">        job.setMapperClass(MaxTemperatureMapper.class);</span><br><span class="line">        job.setReducerClass(MaxTemperatureReducer.class);</span><br><span class="line"></span><br><span class="line">        job.setOutputKeyClass(Text.class);</span><br><span class="line">        job.setOutputValueClass(IntWritable.class);</span><br><span class="line"></span><br><span class="line">		System.exit(job.waitForCompletion(<span class="literal">true</span>) ? <span class="number">0</span> : <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-분산형-맵리듀스"><a href="#2-분산형-맵리듀스" class="headerlink" title="2. 분산형 맵리듀스"></a>2. 분산형 맵리듀스</h1><p>하둡은 확장을 위해</p>
+<ul>
+<li>HDFS라는 분산 파일시스템에 전체 데이터를 저장하고</li>
+<li>각 클러스터에서 맵리듀스 프로그램을 실행하고</li>
+<li>YARN이라 불리는 하둡 자원 관리 시스템을 이용한다.</li>
+</ul>
+<hr>
+<ul>
+<li>잡은 클라이언트 명시한 작업을 의미한다.<ul>
+<li>입력 데이터</li>
+<li>맵리듀스 프로그램</li>
+<li>설정 정보</li>
+</ul>
+</li>
+<li>잡은 map task와 reduce task로 나누어 실행된다.</li>
+<li>각 태스크는 YARN으로 스케줄링되어 클러스터의 여러 노드에서 실행된다.<ul>
+<li>특정 노드의 태스크 하나가 실패하면, 자동으로 다른 노드를 재할당하여 실행한다.</li>
+</ul>
+</li>
+<li>하둡은 맵리듀스 잡의 입력을 스플릿이라는 고정 단위로 분리하여 처리한다.<ul>
+<li>스플릿 (64MB ~ 128MB) : 잡의 입력 단위<ul>
+<li>레코드 : MapReduce의 입력 단위</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>스플릿이 너무 작으면, 태스크 생성을 위한 오버헤드 때문에 실행시간이 증가한다.</li>
+</ul>
+<blockquote>
+<p>왠만하면 스플릿의 크기와 블록의 크기랑 똑같이 맞추길 바람!</p>
+</blockquote>
+<h2 id="2-1-맵태스크"><a href="#2-1-맵태스크" class="headerlink" title="2.1 맵태스크"></a>2.1 맵태스크</h2><img src="/2022/04/13/02-MapReduce/image-20220312163412946.png" class="">
+
+<ol>
+<li>데이터가 있는 노드에 맵태스크를 실행할 때 가장 빠르게 작동한다.</li>
+<li>필요한 블록 복제본이 있는 노드가 맵태스크를 수행한다면, 같은 랙간의 통신을 통해 수행한다.</li>
+<li>필요한 블록 복제본이 있는 랙의 모든 노드가 맵태스크를 수행한다면, 다른 랙에 있는 노드와의 통신을 수행한다.</li>
+</ol>
+<h2 id="2-2-리듀스태스크"><a href="#2-2-리듀스태스크" class="headerlink" title="2.2 리듀스태스크"></a>2.2 리듀스태스크</h2><ol>
+<li>맵의 결과들은 네트워크를 통해 리듀스 태스크가 실행 중인 노드로 전송된다.</li>
+<li>이를 모두 병합한 후에 <code>reduce</code>함수를 실행한다.</li>
+<li>결과값은 로컬 노드에 저장된다. (복제본은 외부 랙에 저장)</li>
+</ol>
+<blockquote>
+<p>리듀스태스크를 수행하는 것은 네트워크 대역폭을 거의 소모하지 않는다.</p>
+</blockquote>
+<ul>
+<li>맵의 아웃풋 키가 동일할 경우 같은 파티션에 배치된다.</li>
+</ul>
+<img src="/2022/04/13/02-MapReduce/image-20220312165544759.png" class="">
+
+<img src="/2022/04/13/02-MapReduce/image-20220312165634723.png" class="">
+
+<ul>
+<li>분산형 맵리듀스 그림을 통해 왜 같은 키끼리 병합하는 과정을 shuffle이라 하는 지 이해할 수 있다.</li>
+</ul>
+<h2 id="2-3-컴바인"><a href="#2-3-컴바인" class="headerlink" title="2.3 컴바인"></a>2.3 컴바인</h2><ul>
+<li>맵태스크에서 리듀스태스크로 넘아갈 때 네트워크 대역폭을 줄이기 위해 컴바이너를 쓸 수도 있다.<ul>
+<li>맵태스크를 수행하는 노드에서 병합하여 <code>reduce</code>를 한 후에 넘기는 방식이다.</li>
+<li>최대, 최소 연산은 상관없지만 평균 연산은 문제가 생긴다.</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.hadoop.fs.Path;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.IntWritable;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.io.Text;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.Job;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.input.FileInputFormat;</span><br><span class="line"><span class="keyword">import</span> org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MaxTemperature</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">		<span class="keyword">if</span> (args.length != <span class="number">2</span>) &#123;</span><br><span class="line">			System.err.println(<span class="string">&quot;Usage: MaxTemperature &lt;input path&gt; &lt;output path&gt;&quot;</span>);</span><br><span class="line">			System.exit(-<span class="number">1</span>);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">Job</span> <span class="variable">job</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Job</span>();</span><br><span class="line">        job.setJarByClass(MaxTemperature.class);</span><br><span class="line">        job.setJobName(<span class="string">&quot;Max temperature&quot;</span>);</span><br><span class="line"></span><br><span class="line">        FileInputFormat.addInputPath(job, <span class="keyword">new</span> <span class="title class_">Path</span>(args[<span class="number">0</span>]));</span><br><span class="line">        FileOutputFormat.setOutputPath(job, <span class="keyword">new</span> <span class="title class_">Path</span>(args[<span class="number">1</span>]));</span><br><span class="line"></span><br><span class="line">        job.setMapperClass(MaxTemperatureMapper.class);</span><br><span class="line">        <span class="comment">// @@@@@@@@@@@@@@@@@@@@@@</span></span><br><span class="line">        job.setCombinerClass(MaxTemperatureReducer.class);</span><br><span class="line">        <span class="comment">// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span></span><br><span class="line">        job.setReducerClass(MaxTemperatureReducer.class);</span><br><span class="line"></span><br><span class="line">        job.setOutputKeyClass(Text.class);</span><br><span class="line">        job.setOutputValueClass(IntWritable.class);</span><br><span class="line"></span><br><span class="line">		System.exit(job.waitForCompletion(<span class="literal">true</span>) ? <span class="number">0</span> : <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-하둡-스트리밍"><a href="#3-하둡-스트리밍" class="headerlink" title="3. 하둡 스트리밍"></a>3. 하둡 스트리밍</h1><p>자바 외에 다른 언어로 맵리듀스 함수를 작성할  수 있게 해주는 API이다.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> sys.stdin:</span><br><span class="line">    val = line.strip()</span><br><span class="line">    (year, temp, q) = (val[<span class="number">15</span>:<span class="number">19</span>], val[<span class="number">87</span>:<span class="number">92</span>], val[<span class="number">92</span>:<span class="number">93</span>])</span><br><span class="line">    <span class="keyword">if</span> (temp != <span class="string">&quot;+9999&quot;</span> <span class="keyword">and</span> re.match(<span class="string">&quot;[01459]&quot;</span>, q)):</span><br><span class="line">	    <span class="built_in">print</span> <span class="string">&quot;%s\t%s&quot;</span> % (year, temp)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">(last_key, max_val) = (<span class="literal">None</span>, -sys.maxint)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> sys.stdin:</span><br><span class="line">    (key, val) = line.strip().split(<span class="string">&quot;\t&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> last_key <span class="keyword">and</span> last_key != key:</span><br><span class="line">    	<span class="built_in">print</span> <span class="string">&quot;%s\t%s&quot;</span> % (last_key, max_val)</span><br><span class="line">    	(last_key, max_val) = (key, <span class="built_in">int</span>(val))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">	    (last_key, max_val) = (key, <span class="built_in">max</span>(max_val, <span class="built_in">int</span>(val)))</span><br><span class="line"><span class="keyword">if</span> last_key:</span><br><span class="line">	<span class="built_in">print</span> <span class="string">&quot;%s\t%s&quot;</span> % (last_key, max_val)</span><br></pre></td></tr></table></figure>
+
+<p>그 후에 스트리밍 JAR 파일의 이름을 명시적으로 지정한다.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \</span><br><span class="line">-input input/ncdc/sample.txt \</span><br><span class="line">-output output \</span><br><span class="line">-mapper ch02-mr-intro/src/main/python/max_temperature_map.py \</span><br><span class="line">-combiner ch02-mr-intro/src/main/python/max_temperature_reduce.py \</span><br><span class="line">-reducer ch02-mr-intro/src/main/python/max_temperature_reduce.py</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MapReduce/" rel="tag"># MapReduce</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/13/01-intro/" rel="prev" title="01 intro">
+      <i class="fa fa-chevron-left"></i> 01 intro
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/13/03-HDFS/" rel="next" title="03 HDFS">
+      03 HDFS <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%EB%A7%B5%EB%A6%AC%EB%93%80%EC%8A%A4"><span class="nav-text">1. 맵리듀스</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%EB%B6%84%EC%82%B0%ED%98%95-%EB%A7%B5%EB%A6%AC%EB%93%80%EC%8A%A4"><span class="nav-text">2. 분산형 맵리듀스</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-%EB%A7%B5%ED%83%9C%EC%8A%A4%ED%81%AC"><span class="nav-text">2.1 맵태스크</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%EB%A6%AC%EB%93%80%EC%8A%A4%ED%83%9C%EC%8A%A4%ED%81%AC"><span class="nav-text">2.2 리듀스태스크</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%EC%BB%B4%EB%B0%94%EC%9D%B8"><span class="nav-text">2.3 컴바인</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%ED%95%98%EB%91%A1-%EC%8A%A4%ED%8A%B8%EB%A6%AC%EB%B0%8D"><span class="nav-text">3. 하둡 스트리밍</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
