@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leequant7612.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1. 서블릿이란?서블릿은 특수한 기능을 하는 서버에서의 작은 프로그램 단위이다.  request를 받아 model로부터 그 결과값을 받아 request나 session영역에 저장하고 결과값을 뿌려줄 적절한 view(jsp페이지)를 선택한다.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="01_Servlet_N_JSP.md">
+<meta property="og:url" content="http://leequant7612.github.io/2022/05/17/01-Servlet-N-JSP/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1. 서블릿이란?서블릿은 특수한 기능을 하는 서버에서의 작은 프로그램 단위이다.  request를 받아 model로부터 그 결과값을 받아 request나 session영역에 저장하고 결과값을 뿌려줄 적절한 view(jsp페이지)를 선택한다.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://leequant7612.github.io/2022/05/17/01-Servlet-N-JSP/image-20220515154509328.png">
+<meta property="og:image" content="http://leequant7612.github.io/2022/05/17/01-Servlet-N-JSP/image-20220515161737427.png">
+<meta property="article:published_time" content="2022-05-17T08:06:13.000Z">
+<meta property="article:modified_time" content="2022-05-17T08:14:26.796Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Web">
+<meta property="article:tag" content="JSP">
+<meta property="article:tag" content="Servlet">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://leequant7612.github.io/2022/05/17/01-Servlet-N-JSP/image-20220515154509328.png">
+
+<link rel="canonical" href="http://leequant7612.github.io/2022/05/17/01-Servlet-N-JSP/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>01_Servlet_N_JSP.md | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://leequant7612.github.io/2022/05/17/01-Servlet-N-JSP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          01_Servlet_N_JSP.md
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-05-17 17:06:13 / Modified: 17:14:26" itemprop="dateCreated datePublished" datetime="2022-05-17T17:06:13+09:00">2022-05-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-Programming/" itemprop="url" rel="index"><span itemprop="name">Web Programming</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-Programming/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-서블릿이란"><a href="#1-서블릿이란" class="headerlink" title="1. 서블릿이란?"></a>1. 서블릿이란?</h1><p>서블릿은 특수한 기능을 하는 서버에서의 작은 프로그램 단위이다.</p>
+<ul>
+<li>request를 받아</li>
+<li>model로부터 그 결과값을 받아</li>
+<li>request나 session영역에 저장하고</li>
+<li>결과값을 뿌려줄 적절한 view(jsp페이지)를 선택한다.</li>
+</ul>
+<span id="more"></span>
+
+<img src="/2022/05/17/01-Servlet-N-JSP/image-20220515154509328.png" class="">
+
+<h2 id="1-1-서블릿-클래스의-구조"><a href="#1-1-서블릿-클래스의-구조" class="headerlink" title="1.1 서블릿 클래스의 구조"></a>1.1 서블릿 클래스의 구조</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BOTHController</span> <span class="keyword">extends</span> <span class="title class_">HttpServlet</span> &#123;</span><br><span class="line">    </span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doPost</span><span class="params">(HttpServletRequest req, HttpServletResponse resp)</span> <span class="keyword">throws</span> ServletException, IOException &#123;</span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">			로직 작성</span></span><br><span class="line"><span class="comment">		*/</span></span><br><span class="line">        req.getRequestDispatcher(<span class="string">&quot;JSP명 혹은 서블릿URL&quot;</span>).forward(req, resp);</span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">doGet</span><span class="params">(HttpServletRequest req, HttpServletResponse resp)</span> <span class="keyword">throws</span> ServletException, IOException &#123;</span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">			로직 작성</span></span><br><span class="line"><span class="comment">		*/</span></span><br><span class="line">        req.getRequestDispatcher(<span class="string">&quot;JSP명 혹은 서블릿URL&quot;</span>).forward(req, resp);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>GET방식과 POST방식 요청에 따른 구분이 없는 경우엔 <code>doService</code>에 로직을 구현해도 된다.</p>
+</blockquote>
+<ul>
+<li><p><code>HttpServletRequest req</code></p>
+<ul>
+<li><code>getParameter(name)</code></li>
+<li><code>getContextPath()</code></li>
+<li><code>getMethod()</code></li>
+<li>…</li>
+</ul>
+</li>
+<li><p><code>HttpServletResponse resp</code></p>
+<ul>
+<li><p><code>sendRedirect(location)</code></p>
+</li>
+<li><p><code>getWriter()</code> : 클라이언트로 보내지는 Output Stream 반환</p>
+<blockquote>
+<p>주로, jsp 이동없이 서블릿에서 간단하게 처리할 때 사용</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PrintWriter out= resp.getWriter();</span><br><span class="line">out.println(<span class="string">&quot;&lt;script&gt;&quot;</span>);</span><br><span class="line">out.println(<span class="string">&quot;alert(&#x27;비밀번호가 일치하지 않아요&#x27;);&quot;</span>);</span><br><span class="line">out.println(<span class="string">&quot;history.back();&quot;</span>);</span><br><span class="line">out.println(<span class="string">&quot;&lt;/script&gt;&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>addCookie(cookie)</code> : 응답에 쿠키를 추가</p>
+<blockquote>
+<p>요샌 거의 웹스토리지로 대체됨</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-2-서블릿의-생명-주기"><a href="#1-2-서블릿의-생명-주기" class="headerlink" title="1.2 서블릿의 생명 주기"></a>1.2 서블릿의 생명 주기</h2><img src="/2022/05/17/01-Servlet-N-JSP/image-20220515161737427.png" class="">
+
+<ul>
+<li>서블릿 객체 하나가 여러 클라이언트들의 요청을 처리한다.</li>
+<li>서블릿은 URL 요청에 의해 처음 실행됐을 때 <code>init()</code>메서드를 통해 컨테이너상의 객체로 생성된다.<ul>
+<li>생성 전에 해야할 작업이 있다면, <code>destory()</code>를 오버라이딩하면 된다.</li>
+</ul>
+</li>
+<li>생성된 서블릿 객체는 <code>service(req, resp)</code>를 통해 request를 처리한다.<ul>
+<li><code>service</code>는 request의 메소드를 확인하여 <code>doGet()</code> 혹은 <code>doPost()</code>실행</li>
+</ul>
+</li>
+<li>컨테이너를 종료하거나 <code>destroy()</code> 실행 시 서블릿객체는 제거된다.<ul>
+<li>제거 전에 해야할 작업이 있다면, <code>destory()</code>를 오버라이딩하면 된다.</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-3-페이지-이동"><a href="#1-3-페이지-이동" class="headerlink" title="1.3 페이지 이동"></a>1.3 페이지 이동</h2><ul>
+<li><code>response.sendRedirect(&quot;jsp명&quot;)</code><ul>
+<li>리퀘스트 영역의 데이터가 필요없는 경우에 사용</li>
+<li>현재 페이지를 응답으로 보낸 후에, 클라이언트가 새롭게 요청을 보내는 구조</li>
+</ul>
+</li>
+<li><code>request.getRequest.Dispatcher(&quot;jsp명 혹은 서블릿명&quot;).forward(request, response)</code><ul>
+<li>리퀘스트 영역의 데이터가 필요한 경우에 사용</li>
+<li>request 객체 유지한채로 서버측에서 페이지 이동하는 구조</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-4-속성-관리"><a href="#1-4-속성-관리" class="headerlink" title="1.4 속성 관리"></a>1.4 속성 관리</h2><p>맵구조로 관리되며 같은 영역 내에서 데이터가 공유가 가능해진다.</p>
+<ul>
+<li>페이지영역 : 한 페이지 </li>
+<li>리퀘스트영역 : 한 페이지에서 시작해 포워드된 페이지까지</li>
+<li>세션영역 : 세션 내내</li>
+<li>컨텍스트영역 : 애플리케이션 종료까지</li>
+</ul>
+<p>전자쪽은 서블릿간의 데이터 전달에서 사용되고, 후자쪽은 컨테이너 관리에 사용되는 경향이 있다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">request.setAttribute(name, object)</span><br><span class="line">request.getAttribute(name)</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-5-세션-및-웹스토리지"><a href="#1-5-세션-및-웹스토리지" class="headerlink" title="1.5 세션 및 웹스토리지"></a>1.5 세션 및 웹스토리지</h2><h3 id="1-5-1-세션"><a href="#1-5-1-세션" class="headerlink" title="1.5.1 세션"></a>1.5.1 세션</h3><ul>
+<li>클라이언트가 웹서버에 처음 접속할 때 세션객체가 컨테이너에 생성된다.</li>
+<li>브라우저가 보내는 요청헤더에 Session ID가 포함되어 있다.</li>
+<li>ID가 있으니 연결이 지속되어있지 않아도 세션 영역 데이터에 접근할 수 있다. </li>
+<li>세션의 지속시간은 web.xml에서 수정할 수 있다. (디폴트 30분)</li>
+<li>로그인 유지, 장바구니 등에서 사용된다.</li>
+<li>너무 많은 데이터를 세션객체에 저장하면 서버에 과부하가 걸리니 웹스토리지로 빼는 게 좋다.</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 로그인 로직</span></span><br><span class="line">session.setAttribute(<span class="string">&quot;USER-ID&quot;</span>, id);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (session.getAttribute(<span class="string">&quot;USER_ID&quot;</span>) != <span class="literal">null</span>) &#123;</span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">		로그인 된 경우 실행할 로직</span></span><br><span class="line"><span class="comment">	*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-5-2-웹스토리지"><a href="#1-5-2-웹스토리지" class="headerlink" title="1.5.2 웹스토리지"></a>1.5.2 웹스토리지</h3><blockquote>
+<p>좀 주제에서 벗어나는 것 같은데 둘 데가 마땅치 않아서 …</p>
+</blockquote>
+<p>localStorage는 영구적으로 보관되는 웹브라우저의 공간이다.</p>
+<p>sessionStorage는 브라우저의 탭이 유지되는 동안 보관되는 웹브라우저의 공간이다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sessionStorage에 장바구니 추가하는 로직</span></span><br><span class="line">addCart.<span class="property">onclick</span> = <span class="keyword">function</span>(<span class="params">e</span>) &#123;</span><br><span class="line">    checkedList.<span class="title function_">forEach</span>(<span class="keyword">function</span>(<span class="params">item</span>) &#123;</span><br><span class="line">        sessionStorage.<span class="title function_">setItem</span>(item.<span class="property">value</span>, item.<span class="property">value</span>);</span><br><span class="line">    &#125;);	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 장바구니 불러오는 로직</span></span><br><span class="line">showCart.<span class="property">onclick</span> = <span class="keyword">function</span>(<span class="params">e</span>) &#123;</span><br><span class="line">    <span class="title class_">Object</span>.<span class="title function_">keys</span>(sessionStorage).<span class="title function_">forEach</span>(<span class="function">(<span class="params">itemValue</span>) =&gt;</span> &#123;</span><br><span class="line">    &#125;);	</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-JSP란"><a href="#2-JSP란" class="headerlink" title="2. JSP란?"></a>2. JSP란?</h1><p>JSP는 HTML에 자바의 로직과 데이터들을 사용하기 위해 나온 템플릿 기술이다.</p>
+<p>JSP는 톰캣엔진에 의해 java코드로 변환되고 컨테이너상의 서블릿 객체로서 관리된다.</p>
+<h2 id="2-1-JSP-지시어"><a href="#2-1-JSP-지시어" class="headerlink" title="2.1 JSP 지시어"></a>2.1 JSP 지시어</h2><ul>
+<li><code>&lt;%@ include file=&quot;파일위치&quot; %&gt;</code> : 코드 그 자체를 불러온다. (Header, Footer에 주로 사용)</li>
+<li><code>&lt;%@ taglib prefix=&quot;태그접두어&quot; uri=&quot;태그라이브러리경로&quot; %&gt;</code> : 커스텀 태그 사용</li>
+</ul>
+<h2 id="2-2-스크립트"><a href="#2-2-스크립트" class="headerlink" title="2.2 스크립트"></a>2.2 스크립트</h2><p><strong>Declaration 태그</strong></p>
+<ul>
+<li>멤버변수, 멤버메소드 선언하는 용도로 사용된다.</li>
+</ul>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;%!</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">INT_MAX</span> <span class="operator">=</span> Integer.MAX_VALUE;</span><br><span class="line">    <span class="keyword">private</span> JspWriter out;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> <span class="title function_">plusMethod</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> var1 + var2;</span><br><span class="line">    &#125;</span><br><span class="line">%&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Scritlet 태그</strong></p>
+<ul>
+<li><code>_jspService()</code>내에 포함되는 자바코드다.</li>
+<li>다양한 내장객체들이 있다.<ul>
+<li><code>pageContext</code>, <code>request</code>, <code>session</code>, &#96;application&#96;&#96;</li>
+<li><code>out</code>, <code>response</code>, …</li>
+</ul>
+</li>
+</ul>
+<p><strong>Expression 태그</strong></p>
+<ul>
+<li>주로 HTML에 자바표현식을 넣어 스트링을 출력하고자 할 때 사용한다.</li>
+</ul>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">	...</span><br><span class="line">    현재시간 : &lt;%= java.time.LocalDateTime.now() %&gt;</span><br><span class="line">    ...</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-액션-태그"><a href="#2-3-액션-태그" class="headerlink" title="2.3 액션 태그"></a>2.3 액션 태그</h2><p>요즘같이 JSP의 역할이 축소된 상황에서 권장되진 않는다.</p>
+<h2 id="2-4-EL"><a href="#2-4-EL" class="headerlink" title="2.4 EL"></a>2.4 EL</h2><ul>
+<li><code>&lt;jsp:forward page=&quot;???.jsp&quot;/&gt;</code> : 다른 페이지로 포워드</li>
+<li><code>&lt;jsp:include page=&quot;???.jsp&quot;/&gt;</code> : 다른 페이지를 HTML로 변환한 후에 현재 페이지에 삽입</li>
+<li><code>&lt;jsp:param value=&quot;????&quot; name=&quot;pwd&quot;/&gt;</code> : <code>jsp:forward</code>, <code>jsp:include</code>에 파라미터 추가</li>
+</ul>
+<h3 id="2-4-1-자바빈"><a href="#2-4-1-자바빈" class="headerlink" title="2.4.1 자바빈"></a>2.4.1 자바빈</h3><p>자바빈은 아무것도 상속하지 않고 getter&#x2F;setter를 제공한 직렬화가능한 자바 클래스를 의미한다.</p>
+<blockquote>
+<p>모든 멤버변수가 primitive거나 직렬화 가능한 타입이여야한다. </p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Member</span> &#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> id;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setId</span><span class="params">(<span class="type">int</span> id)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.id = id;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getId</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> id;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--</span><br><span class="line">request 파라미터명과 자바빈의 속성명이 일치시 자바빈으로 바로 뺄 수 있다.</span><br><span class="line">--&gt;</span><br><span class="line"></span><br><span class="line">&lt;jsp:useBean id=<span class="string">&quot;action&quot;</span> class=<span class="string">&quot;model.MemberDTO&quot;</span>/&gt;</span><br><span class="line">&lt;jsp:useBean id=<span class="string">&quot;member&quot;</span> type=<span class="string">&quot;model.MemberDTO&quot;</span> scope=<span class="string">&quot;request&quot;</span>/&gt;</span><br><span class="line"></span><br><span class="line">&lt;li&gt;아이디 : &lt;jsp:getProperty  name=<span class="string">&quot;member&quot;</span> property=<span class="string">&quot;id&quot;</span>/&gt;&lt;/li&gt;</span><br><span class="line">&lt;li&gt;비번 : &lt;jsp:getProperty  name=<span class="string">&quot;member&quot;</span> property=<span class="string">&quot;pwd&quot;</span>/&gt;&lt;/li&gt;</span><br><span class="line">&lt;li&gt;이름 : &lt;jsp:getProperty  name=<span class="string">&quot;member&quot;</span> property=<span class="string">&quot;name&quot;</span>/&gt;&lt;/li&gt;</span><br><span class="line">&lt;li&gt;나이 : &lt;jsp:getProperty  name=<span class="string">&quot;member&quot;</span> property=<span class="string">&quot;age&quot;</span>/&gt;&lt;/li&gt;</span><br><span class="line"></span><br><span class="line">&lt;li&gt;아이디 : &lt;%=member.getId() %&gt;&lt;/li&gt;</span><br><span class="line">&lt;li&gt;비번 : &lt;%=member.getPwd() %&gt;&lt;/li&gt;</span><br><span class="line">&lt;li&gt;이름 : &lt;%=member.getName()%&gt;&lt;/li&gt;</span><br><span class="line">&lt;li&gt;나이 : &lt;%=member.getAge() %&gt;&lt;/li&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-5-EL-amp-JSTL"><a href="#2-5-EL-amp-JSTL" class="headerlink" title="2.5 EL &amp; JSTL"></a>2.5 EL &amp; JSTL</h2><h3 id="2-5-1-EL"><a href="#2-5-1-EL" class="headerlink" title="2.5.1 EL"></a>2.5.1 EL</h3><ul>
+<li>데이터를 출력하기 위한 용도로 설계 됐다.</li>
+<li>현재 페이지의 자바 객체 접근 가능</li>
+<li>scope object에 저장된 <strong>자바빈 객체</strong>를 손쉽게 접근 가능</li>
+<li>EL은 단순한 출력 외에도 간단한 연산을 지원한다 (거의 쓰지 않는다)</li>
+</ul>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--</span><br><span class="line">	member를 찾으면</span><br><span class="line">	pageScope =&gt; requestScope =&gt; sessionScope =&gt; applicationScope</span><br><span class="line">--&gt;</span><br><span class="line">$&#123;member&#125;</span><br><span class="line">$&#123;myList[<span class="number">0</span>]&#125;</span><br><span class="line">$&#123;myMap[<span class="string">&quot;key&quot;</span>]&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>자바 객체에 접근하고자 할 땐, <code>$&#123;pageContext&#125;</code>를 사용한다.</li>
+</ul>
+<h3 id="2-5-2-JSTL"><a href="#2-5-2-JSTL" class="headerlink" title="2.5.2 JSTL"></a>2.5.2 JSTL</h3><ul>
+<li>EL에는 없는 조건문, 반복문, 간단한 연산 및 유용한 기능을 쓸 수 있도록 만들어진 태그 라이브러리</li>
+</ul>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%@ taglib prefix=<span class="string">&quot;c&quot;</span> uri=<span class="string">&quot;http://java.sun.com/jsp/jstl/core&quot;</span> %&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:set <span class="keyword">var</span>=<span class="string">&quot;pagevar&quot;</span> value=<span class="string">&quot;페이지 영역&quot;</span> /&gt;</span><br><span class="line">&lt;c:set <span class="keyword">var</span>=<span class="string">&quot;requestvar&quot;</span> value=<span class="string">&quot;리퀘스트 영역&quot;</span> scope=<span class="string">&quot;request&quot;</span> /&gt;</span><br><span class="line">&lt;c:set target=<span class="string">&quot;$&#123;defaultMember&#125;&quot;</span> property=<span class="string">&quot;id&quot;</span> value=<span class="string">&quot;PARK&quot;</span>/&gt;</span><br><span class="line">$&#123;pagevar&#125;</span><br><span class="line">$&#123;requestvar&#125;</span><br><span class="line">$&#123;defaultMember&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:<span class="keyword">if</span> test=<span class="string">&quot;$&#123;empty records &#125;&quot;</span> <span class="keyword">var</span>=<span class="string">&quot;isEmpty&quot;</span>&gt;</span><br><span class="line">	...</span><br><span class="line">&lt;/c:<span class="keyword">if</span>&gt;</span><br><span class="line">&lt;c:<span class="keyword">if</span> test=<span class="string">&quot;$&#123;not isEmpty &#125;&quot;</span>&gt;</span><br><span class="line">	...</span><br><span class="line">&lt;/c:<span class="keyword">if</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:forEach begin=<span class="string">&quot;1&quot;</span> end=<span class="string">&quot;6&quot;</span> <span class="keyword">var</span>=<span class="string">&quot;i&quot;</span> varStatus=<span class="string">&quot;loop&quot;</span>&gt;</span><br><span class="line">    &lt;c:choose&gt;</span><br><span class="line">    	&lt;c:when test=<span class="string">&quot;$&#123;loop.first&#125;&quot;</span>&gt;</span><br><span class="line">    		&lt;c:set <span class="keyword">var</span>=<span class="string">&quot;color&quot;</span> value=<span class="string">&quot;blue&quot;</span>/&gt;</span><br><span class="line">    	&lt;/c:when&gt;</span><br><span class="line">    	&lt;c:when test=<span class="string">&quot;$&#123;loop.last&#125;&quot;</span>&gt;</span><br><span class="line">    		&lt;c:set <span class="keyword">var</span>=<span class="string">&quot;color&quot;</span> value=<span class="string">&quot;cyan&quot;</span>/&gt;</span><br><span class="line">    	&lt;/c:when&gt;</span><br><span class="line">    	&lt;c:when test=<span class="string">&quot;$&#123;loop.count % 2==0&#125;&quot;</span>&gt;</span><br><span class="line">    		&lt;c:set <span class="keyword">var</span>=<span class="string">&quot;color&quot;</span> value=<span class="string">&quot;red&quot;</span>/&gt;</span><br><span class="line">    	&lt;/c:when&gt;</span><br><span class="line">    	&lt;c:otherwise&gt;</span><br><span class="line">    		&lt;c:set <span class="keyword">var</span>=<span class="string">&quot;color&quot;</span> value=<span class="string">&quot;green&quot;</span>/&gt;</span><br><span class="line">    	&lt;/c:otherwise&gt;</span><br><span class="line">    &lt;/c:choose&gt;    		</span><br><span class="line">    &lt;h$&#123;i &#125; style=<span class="string">&quot;color:$&#123;color&#125;&quot;</span>&gt;제목$&#123;i &#125;&lt;/h$&#123;i &#125;&gt;    		</span><br><span class="line">&lt;/c:forEach&gt;</span><br><span class="line"></span><br><span class="line">&lt;c:forEach <span class="keyword">var</span>=<span class="string">&quot;color&quot;</span> items=<span class="string">&quot;$&#123;colors &#125;&quot;</span> varStatus=<span class="string">&quot;loop&quot;</span>&gt;</span><br><span class="line">    &lt;h5&gt;$&#123;loop.count&#125;번째 반복&lt;/h5&gt;</span><br><span class="line">    &lt;ul class=<span class="string">&quot;list-unstyled&quot;</span>&gt;</span><br><span class="line">    &lt;li&gt;\$&#123;loop.index &#125; : $&#123;loop.index &#125;&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;\$&#123;loop.first &#125; : $&#123;loop.first &#125;&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;\$&#123;loop.last &#125; : $&#123;loop.last &#125;&lt;/li&gt;</span><br><span class="line">    &lt;li&gt;\$&#123;loop.current &#125; : $&#123;loop.current &#125;&lt;/li&gt;</span><br><span class="line">    &lt;/ul&gt;</span><br><span class="line">&lt;/c:forEach&gt;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Web/" rel="tag"># Web</a>
+              <a href="/tags/JSP/" rel="tag"># JSP</a>
+              <a href="/tags/Servlet/" rel="tag"># Servlet</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/05/17/00-Setting/" rel="prev" title="00_Setting.md">
+      <i class="fa fa-chevron-left"></i> 00_Setting.md
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/05/17/02-DataRoom/" rel="next" title="02_DataRoom">
+      02_DataRoom <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%EC%84%9C%EB%B8%94%EB%A6%BF%EC%9D%B4%EB%9E%80"><span class="nav-text">1. 서블릿이란?</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-%EC%84%9C%EB%B8%94%EB%A6%BF-%ED%81%B4%EB%9E%98%EC%8A%A4%EC%9D%98-%EA%B5%AC%EC%A1%B0"><span class="nav-text">1.1 서블릿 클래스의 구조</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%EC%84%9C%EB%B8%94%EB%A6%BF%EC%9D%98-%EC%83%9D%EB%AA%85-%EC%A3%BC%EA%B8%B0"><span class="nav-text">1.2 서블릿의 생명 주기</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-%ED%8E%98%EC%9D%B4%EC%A7%80-%EC%9D%B4%EB%8F%99"><span class="nav-text">1.3 페이지 이동</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-%EC%86%8D%EC%84%B1-%EA%B4%80%EB%A6%AC"><span class="nav-text">1.4 속성 관리</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-%EC%84%B8%EC%85%98-%EB%B0%8F-%EC%9B%B9%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80"><span class="nav-text">1.5 세션 및 웹스토리지</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-1-%EC%84%B8%EC%85%98"><span class="nav-text">1.5.1 세션</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-2-%EC%9B%B9%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80"><span class="nav-text">1.5.2 웹스토리지</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-JSP%EB%9E%80"><span class="nav-text">2. JSP란?</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-JSP-%EC%A7%80%EC%8B%9C%EC%96%B4"><span class="nav-text">2.1 JSP 지시어</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8"><span class="nav-text">2.2 스크립트</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-%EC%95%A1%EC%85%98-%ED%83%9C%EA%B7%B8"><span class="nav-text">2.3 액션 태그</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-EL"><span class="nav-text">2.4 EL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-1-%EC%9E%90%EB%B0%94%EB%B9%88"><span class="nav-text">2.4.1 자바빈</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-EL-amp-JSTL"><span class="nav-text">2.5 EL &amp; JSTL</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-1-EL"><span class="nav-text">2.5.1 EL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-2-JSTL"><span class="nav-text">2.5.2 JSTL</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
