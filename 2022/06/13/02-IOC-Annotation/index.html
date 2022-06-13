@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leequant7612.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1. Inversion Of Controll순제어는 필요한 곳에서 직접 생성하여 사용하는 것을 의미한다.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="02_IOC+Annotation">
+<meta property="og:url" content="http://leequant7612.github.io/2022/06/13/02-IOC-Annotation/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1. Inversion Of Controll순제어는 필요한 곳에서 직접 생성하여 사용하는 것을 의미한다.">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-06-13T09:18:11.000Z">
+<meta property="article:modified_time" content="2022-06-13T09:19:04.897Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://leequant7612.github.io/2022/06/13/02-IOC-Annotation/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>02_IOC+Annotation | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://leequant7612.github.io/2022/06/13/02-IOC-Annotation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          02_IOC+Annotation
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-06-13 18:18:11 / Modified: 18:19:04" itemprop="dateCreated datePublished" datetime="2022-06-13T18:18:11+09:00">2022-06-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-Programming/" itemprop="url" rel="index"><span itemprop="name">Web Programming</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Web-Programming/Java-Spring/" itemprop="url" rel="index"><span itemprop="name">Java Spring</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-Inversion-Of-Controll"><a href="#1-Inversion-Of-Controll" class="headerlink" title="1. Inversion Of Controll"></a>1. Inversion Of Controll</h1><p>순제어는 필요한 곳에서 직접 생성하여 사용하는 것을 의미한다.</p>
+<span id="more"></span>
+
+<hr>
+<p><strong>IOC</strong> : 컨테이너가 객체 생성부터 소멸 까지의 라이프사이클을 관리하게 되어 “제어권이 넘어갔다를 의미한다”.</p>
+<blockquote>
+<p>Spring은 필요로하는 왠만한 객체를 컨테이너가 관리한다.</p>
+</blockquote>
+<p><strong>DI</strong> : 의존성 주입은 IOC 컨테이너에 있는 객체(의존성)를 주입하는 행위이다. </p>
+<blockquote>
+<p>컨트롤러에서 사용하는 대부분의 객체는 DI로 얻어진다.</p>
+</blockquote>
+<p><strong>AOP</strong> : DI보다 더 일반적인 프로그래밍 패러다임으로 핵심로직(메소드) 전후에 Advice(공통기능)를 위빙(주입)하는 방식이다. </p>
+<h2 id="1-1-Autowired로-Bean-Wiring-권장"><a href="#1-1-Autowired로-Bean-Wiring-권장" class="headerlink" title="1.1 @Autowired로 Bean Wiring (권장)"></a>1.1 <code>@Autowired</code>로 Bean Wiring (권장)</h2><p>와이어링은 컨트롤러를 생성할 때 DI를 통해 기존 객체를 연결짓는 것을 의미한다.</p>
+<p><code>@Autowired</code>를 활용하면 빈 설정파일에서 생성자 호출이 필요없다.</p>
+<p><code>@Autowired</code>은 서블릿 컨테이너 설정파일에서 생성한 빈들 중에서</p>
+<ol>
+<li>타입기반으로 인자를 찾는다.</li>
+<li><strong>타입에 해당하는 객체가 2개 이상인 경우</strong> 빈의 id를 기반으로 찾는다.<ul>
+<li>id명 &lt;&#x3D;&#x3D;&gt; 컨트롤러 멤버변수명</li>
+</ul>
+</li>
+<li>id로도 구분이 안된다면 qualifier 태그 활용한다.</li>
+<li>그것도 없으면 500에러가 발생한다. 주입이 꼭 필요하지 않다면 <code>required=false</code>를 인자로 넣는다.</li>
+</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">beans:bean</span> <span class="attr">id</span>=<span class="string">&quot;personA&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.kosmo.springapp.basic.injection.Person&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:qualifier</span> <span class="attr">value</span>=<span class="string">&quot;person1&quot;</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">beans:constructor-arg</span> <span class="attr">type</span>=<span class="string">&quot;java.lang.String&quot;</span> <span class="attr">value</span>=<span class="string">&quot;김김김&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:constructor-arg</span> <span class="attr">type</span>=<span class="string">&quot;java.lang.String&quot;</span> <span class="attr">value</span>=<span class="string">&quot;서울&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:constructor-arg</span> <span class="attr">type</span>=<span class="string">&quot;java.lang.String&quot;</span> <span class="attr">value</span>=<span class="string">&quot;20&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans:bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">beans:bean</span> <span class="attr">id</span>=<span class="string">&quot;personB&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.kosmo.springapp.basic.injection.Person&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:qualifier</span> <span class="attr">value</span>=<span class="string">&quot;person2&quot;</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">beans:constructor-arg</span> <span class="attr">index</span>=<span class="string">&quot;0&quot;</span> <span class="attr">value</span>=<span class="string">&quot;님님님&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:constructor-arg</span> <span class="attr">index</span>=<span class="string">&quot;1&quot;</span> <span class="attr">value</span>=<span class="string">&quot;서울&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:constructor-arg</span> <span class="attr">index</span>=<span class="string">&quot;2&quot;</span> <span class="attr">value</span>=<span class="string">&quot;21&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans:bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="옵션1-Autowired-Qualifier-선택사항"><a href="#옵션1-Autowired-Qualifier-선택사항" class="headerlink" title="옵션1 @Autowired; @Qualifier(선택사항)"></a>옵션1 <code>@Autowired</code>; <code>@Qualifier</code>(선택사항)</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">InjectionController</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier(&quot;person1&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Person personAAA;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier(&quot;person2&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Person personBBB;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@RequestMapping()</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="옵션2-Resource"><a href="#옵션2-Resource" class="headerlink" title="옵션2 (@Resource)"></a>옵션2 (<code>@Resource</code>)</h4><ul>
+<li>좀 더 엄격한 방식이다.</li>
+<li>멤버변수명과 빈설정파일에서 id 속성이 일치할 때만 사용 가능</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">InjectionController</span> &#123;</span><br><span class="line">	<span class="meta">@Resource</span></span><br><span class="line">	<span class="keyword">private</span> Person personA;</span><br><span class="line">	<span class="meta">@Resource</span></span><br><span class="line">	<span class="keyword">private</span> Person personB;</span><br><span class="line">    </span><br><span class="line">	<span class="meta">@RequestMapping(&quot;/Injection/Injection.do&quot;)</span></span><br><span class="line">	<span class="keyword">public</span> String <span class="title function_">execute</span><span class="params">(Map map,<span class="meta">@RequestParam</span> Map paramMap)</span> &#123;</span><br><span class="line">		map.put(<span class="string">&quot;personBefore&quot;</span>, <span class="string">&quot;&quot;</span> + personA + personB);</span><br><span class="line">        personA.setAddr(paramMap.get(<span class="string">&quot;addr&quot;</span>).toString());</span><br><span class="line">		personA.setAge(paramMap.get(<span class="string">&quot;age&quot;</span>).toString());</span><br><span class="line">		personA.setName(paramMap.get(<span class="string">&quot;name&quot;</span>).toString());</span><br><span class="line">		map.put(<span class="string">&quot;personAfter&quot;</span>, <span class="string">&quot;&quot;</span> + personA + personB);</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;tutorials/Injection&quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>DI로 받은 빈을 세터로 값 주입 시 원본이 바뀌니 이러한 프로그래밍은 지양하자</p>
+</blockquote>
+<h2 id="1-2-세터를-활용한-주입-비추천"><a href="#1-2-세터를-활용한-주입-비추천" class="headerlink" title="1.2 세터를 활용한 주입 (비추천)"></a>1.2 세터를 활용한 주입 (비추천)</h2><ul>
+<li><code>@Resoruce(name=&quot;아이디&quot;)</code>세터를 호출하면서 인자로 “아이디”에 해당하는 빈을 인자로 넣는다.</li>
+<li>빈 객체에 추가로직을 더해서 설정하고 싶을 때 세터로 주입을 하는 편이다.</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">beans:bean</span> <span class="attr">id</span>=<span class="string">&quot;personA&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.kosmo.springapp.basic.injection.Person&quot;</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">beans:property</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span> <span class="attr">value</span>=<span class="string">&quot;김김김&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:property</span> <span class="attr">name</span>=<span class="string">&quot;age&quot;</span> <span class="attr">value</span>=<span class="string">&quot;20&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:property</span> <span class="attr">name</span>=<span class="string">&quot;addr&quot;</span> <span class="attr">value</span>=<span class="string">&quot;서울&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans:bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">beans:bean</span> <span class="attr">id</span>=<span class="string">&quot;personB&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.kosmo.springapp.basic.injection.Person&quot;</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">beans:property</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span> <span class="attr">value</span>=<span class="string">&quot;김김김&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:property</span> <span class="attr">name</span>=<span class="string">&quot;age&quot;</span> <span class="attr">value</span>=<span class="string">&quot;20&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">beans:property</span> <span class="attr">name</span>=<span class="string">&quot;addr&quot;</span> <span class="attr">value</span>=<span class="string">&quot;서울&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans:bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SetterController</span> &#123;</span><br><span class="line">	<span class="meta">@Resource</span></span><br><span class="line">	<span class="keyword">private</span> Person personA;</span><br><span class="line">	<span class="meta">@Resource</span></span><br><span class="line">	<span class="keyword">private</span> Person personB;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Resoruce(name=&quot;personA&quot;)</span> <span class="comment">// 혹은 @Qualifier(&quot;person1&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPersonA</span><span class="params">(Person abcdefg)</span> &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// 추가적인 로직</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="built_in">this</span>.personA = abcdefg;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Resoruce(name=&quot;personB&quot;)</span> <span class="comment">// 혹은 @Qualifier(&quot;person2&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPersonB</span><span class="params">(Person efghijk)</span> &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// 추가적인 로직</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="built_in">this</span>.personB = efghijk;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-Annotation"><a href="#2-Annotation" class="headerlink" title="2. Annotation @"></a>2. Annotation <code>@</code></h1><p>IOC만 설명하고 넘어가기엔 컨텐츠가 부족하여 다른 Annotation들을 설명하겠다.</p>
+<h2 id="2-1-RequestMapping"><a href="#2-1-RequestMapping" class="headerlink" title="2.1 @RequestMapping"></a>2.1 <code>@RequestMapping</code></h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RequestMappigController</span> &#123;</span><br><span class="line">	<span class="meta">@RequestMapping(</span></span><br><span class="line"><span class="meta">        	value=&quot;/Annotation/RequestMapping.do&quot;,</span></span><br><span class="line"><span class="meta">        	method=RequestMethod.GET)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">both</span><span class="params">(HttpServletRequest req)</span> &#123;</span><br><span class="line">		<span class="comment">//</span></span><br><span class="line">        <span class="comment">//	...</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">	<span class="meta">@RequestMapping(</span></span><br><span class="line"><span class="meta">			value=&quot;/Annotation/RequestMapping.do&quot;,</span></span><br><span class="line"><span class="meta">			method=RequestMethod.POST)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">both</span><span class="params">(HttpServletRequest req)</span> &#123;</span><br><span class="line">		<span class="comment">//</span></span><br><span class="line">        <span class="comment">//	...</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>클래스에 상위 경로를 붙이는 경우</strong> 메소드에선 하위 경로만 적어주면 된다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/Annotation&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ABC</span> &#123;</span><br><span class="line">	<span class="meta">@RequestMapping(&quot;/Annotation/RequestMapping.do&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">both</span><span class="params">(HttpServletRequest req)</span> &#123;</span><br><span class="line">		<span class="comment">//</span></span><br><span class="line">        <span class="comment">//	...</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-1-1-여러요청을-하나의-컨트롤러-메소드로-처리"><a href="#2-1-1-여러요청을-하나의-컨트롤러-메소드로-처리" class="headerlink" title="2.1.1 여러요청을 하나의 컨트롤러 메소드로 처리"></a>2.1.1 여러요청을 하나의 컨트롤러 메소드로 처리</h3><ol>
+<li><p><code>value=&#123;&quot;요청URL1&quot;, &quot;요청URL2&quot;, ...&#125;, method=&#123;RequestMethod.GET, RequestMethod.POST&#125;</code></p>
+</li>
+<li><p><code>@PathVariable</code> 활용</p>
+<blockquote>
+<p>REST API 서버에서 자주 사용하게 될 예정</p>
+</blockquote>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping(&quot;/Annotation/&#123;path&#125;&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">both</span><span class="params">(<span class="meta">@PathVariable</span> String path, <span class="meta">@RequestParam</span> Map&lt;String,String&gt; map, Model model)</span> &#123;</span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">       <span class="comment">//	...</span></span><br><span class="line">       <span class="comment">//</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-RequestParam"><a href="#2-2-RequestParam" class="headerlink" title="2.2 @RequestParam "></a>2.2 <code>@RequestParam </code></h2><p>서블릿 API 사용을 줄이고 <code>@RequestParam</code> 사용을 권장한다.</p>
+<ul>
+<li>코드 간결</li>
+<li>형 변환 필요 없음</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/Annotation&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RequestParamController</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//@RequestParam 사용시 예외처리</span></span><br><span class="line">    <span class="meta">@ExceptionHandler(&#123;Exception.class&#125;)</span></span><br><span class="line">    <span class="keyword">public</span> Stirng <span class="title function_">error</span><span class="params">(Model model, Exception e)</span> &#123;</span><br><span class="line">        model.addAttribute(<span class="string">&quot;errorNumber&quot;</span>, <span class="string">&quot;나이는 숫자만 &quot;</span> + e.getMessage());</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;뷰페이지명&quot;</span>;   </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"> 	<span class="comment">//@RequestParam 미사용시 </span></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/Annotation/RequestParamEqual.do&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">equals</span><span class="params">(HttpServletRequest req)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">name</span> <span class="operator">=</span> req.getParameter(<span class="string">&quot;name&quot;</span>);</span><br><span class="line">            <span class="type">int</span> <span class="variable">age</span> <span class="operator">=</span> Integer.parseInt(req.getParameter(<span class="string">&quot;age&quot;</span>));</span><br><span class="line">            req.setAttribute(<span class="string">&quot;name&quot;</span>, name);</span><br><span class="line">            req.setAttribute(<span class="string">&quot;age&quot;</span>, age + <span class="number">10</span>);            </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (NumberFormatException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;나이는 숫자만&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;뷰페이지명&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"> 	<span class="meta">@RequestMapping(&quot;/Annotation/RequestParamEqual.do&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">equals</span><span class="params">(<span class="meta">@RequestParam</span> String name, <span class="meta">@RequestParam</span> <span class="type">int</span> age)</span> &#123;</span><br><span class="line">        req.setAttribute(<span class="string">&quot;name&quot;</span>, name);</span><br><span class="line">        req.setAttribute(<span class="string">&quot;age&quot;</span>, age + <span class="number">10</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;뷰페이지명&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>함수의 인자명과 파라미터명이 다른 경우</strong></p>
+<ul>
+<li><code>@RequestParam(&quot;req파라미터명&quot;) int arg1</code><ul>
+<li>req파라미터명이 req에 없다면 bad request(404) 에러가 발생한다.</li>
+</ul>
+</li>
+<li><code>@RequestParam(&quot;req파라미터명&quot; required=false) int arg1</code><ul>
+<li>404 에러는 발생하지 않는다.</li>
+<li>default로 값을 넣어주고 싶다면 <code>defaultValue=?</code>를 annotation의 인자로 추가하면 된다.</li>
+</ul>
+</li>
+</ul>
+<p><strong>파라미터 하나의 키에 값이 여러개인 경우</strong></p>
+<ul>
+<li><code>@RequestParam String[] inter</code><ul>
+<li>단순하게 자료형만 입력하면 맨앞의 값만 받기 때문에 배열로 받아야 한다.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-2-1-RequestParam-Map-map"><a href="#2-2-1-RequestParam-Map-map" class="headerlink" title="2.2.1 @RequestParam Map map"></a>2.2.1 <code>@RequestParam Map map</code></h3><ul>
+<li>req파라미터가 굉장히 많을 때 사용한다.</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping(&quot;/Annotation/RequestParamMap.do&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">map</span><span class="params">(ModelMap model, <span class="meta">@RequestParam</span> Map map, <span class="meta">@RequestParam</span> String[] inter)</span> &#123;</span><br><span class="line">    map.put(<span class="string">&quot;inter&quot;</span>, Arrays.toString(inter));</span><br><span class="line">    model.addAllAttributes(map);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;annotation06/Annotation&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-2-데이터커맨드-활용"><a href="#2-2-2-데이터커맨드-활용" class="headerlink" title="2.2.2 데이터커맨드 활용"></a>2.2.2 데이터커맨드 활용</h3><p>유지보수를 위해 Map보단 커맨드 객체(DTO)를 활용하는 것을 권장한다</p>
+<ol>
+<li>DTO 만들기 (속성명 &#x3D; req파라미터명)</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyCommand</span> &#123;</span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line">	<span class="keyword">private</span> String id;</span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">    <span class="comment">// 게터 세터 구현 (Lombok 방식은 나중에 다루겠다)</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>함수</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ModelAttributeController</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// @ModelAttribute 안쓸 시</span></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/Annotation/ModelAttribute.do&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">map</span><span class="params">(MyCommand command, Model model)</span> &#123;</span><br><span class="line">		model.addAttribute(<span class="string">&quot;cmd&quot;</span>, command);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;뷰페이지&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 혹은 @ModelAttribute 활용 시</span></span><br><span class="line">	<span class="meta">@RequestMapping(&quot;/Annotation/ModelAttribute.do&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">map</span><span class="params">(<span class="meta">@ModelAttribute(&quot;cmd&quot;)</span> MyCommand command)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;뷰페이지&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>뷰페이지</li>
+</ol>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 웹문서 --&gt;</span><br><span class="line">$&#123;cmd.name&#125;</span><br><span class="line">$&#123;cmd.id&#125;</span><br></pre></td></tr></table></figure>
+
+<p>미리 컨테이너에 빈으로 등록하고 함수에 DI를 적용하면 유용할 수도 있다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AutowiredController</span> &#123;</span><br><span class="line">	<span class="meta">@Autowired(required=false)</span></span><br><span class="line">	<span class="keyword">private</span> Command fCommand;</span><br><span class="line">	<span class="meta">@Autowired(required=false)</span></span><br><span class="line">	<span class="keyword">private</span> Command sCommand;</span><br><span class="line">   </span><br><span class="line">	<span class="meta">@RequestMapping(&quot;/Annotation/Autowired.do&quot;)</span></span><br><span class="line">	<span class="keyword">public</span> String <span class="title function_">execute</span><span class="params">(Model model)</span> &#123;</span><br><span class="line">		model.addAttribute(</span><br><span class="line">            	<span class="string">&quot;message&quot;</span>,</span><br><span class="line">            	String.format(<span class="string">&quot;fCommand:%s,sCommand:%s&quot;</span>, fCommand, sCommand));</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;뷰페이지&quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-Resource"><a href="#2-3-Resource" class="headerlink" title="2.3 @Resource"></a>2.3 <code>@Resource</code></h2><ul>
+<li>기존 빈객체를 컨트롤러에 넣는게 아닌 경우에 세터로 DI를 하게 된다.</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SetterController</span> &#123;</span><br><span class="line">	<span class="meta">@Resource</span></span><br><span class="line">	<span class="keyword">private</span> Person personA;</span><br><span class="line">	<span class="meta">@Resource</span></span><br><span class="line">	<span class="keyword">private</span> Person personB;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Resoruce(name=&quot;아이디&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPersonA</span><span class="params">(Person abcdefg)</span> &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// 추가적인 로직</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="built_in">this</span>.personA = abcdefg;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Resoruce(name=&quot;아이디&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setPersonB</span><span class="params">(Person efghijk)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.personB = efghijk;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-Lazy"><a href="#2-4-Lazy" class="headerlink" title="2.4 @Lazy"></a>2.4 <code>@Lazy</code></h2><p>첫 요청을 받았을 때 컨트롤러가 생성된다.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Lazy</span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LazyController</span> &#123;</span><br><span class="line">	</span><br><span class="line">    <span class="keyword">public</span> LazyController &#123;</span><br><span class="line">		System.out.println(<span class="string">&quot;이제서야 생성 됐다.&quot;</span>);				</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/Annotation/Lazy.do&quot;)</span></span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>빈 설정파일에 넣어서 생성할 때 지연을 주고 싶다면 <code>&lt;beans:bean lazy-init=&#39;true&#39;&gt;</code>로 줄 수도 있다.</p>
+<h2 id="2-5-스프링에-빈-등록"><a href="#2-5-스프링에-빈-등록" class="headerlink" title="2.5 스프링에 빈 등록"></a>2.5 스프링에 빈 등록</h2><p>스프링에 빈으로 등록하여 다른 곳에 DI를 할 때</p>
+<ul>
+<li><code>Configuration</code> 또는</li>
+<li><code>Component</code></li>
+</ul>
+<p>를 사용하면 된다.</p>
+<p>이를 활용하면 빈 설정파일에 직접 등록하지 않아도 되니깐 빈 관리하기 쉽다</p>
+<ul>
+<li><p><code>@Component</code></p>
+<ul>
+<li>개발자가 직접 작성한 클래스 한개를 등록한다.</li>
+</ul>
+</li>
+<li><p><code>@Configuration</code> + <code>@Bean</code></p>
+<ul>
+<li><code>@Service</code>와 동일하다</li>
+<li>관련있는 빈들끼리만 모으면 관리가 용이하다,</li>
+</ul>
+</li>
+</ul>
+<hr>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SpringBeanConfig</span> &#123;</span><br><span class="line">	<span class="meta">@Bean</span></span><br><span class="line">	<span class="keyword">public</span> OneMemoRepository <span class="title function_">oneMemoRepository</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">OneMemoRepository</span>();</span><br><span class="line">	&#125;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// 혹은</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OneMemoRepository</span>&#123;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ABC</span> &#123;</span><br><span class="line">	<span class="meta">@Autowired</span> <span class="comment">// 혹은 @Resource</span></span><br><span class="line">	<span class="keyword">private</span> OneMemoRepository oneMemoRepository;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@RequestMapping(&quot;/Configuration/Configuration.do&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">exec</span><span class="params">(Model model)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;뷰페이지명&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-6-영역에-데이터-저장"><a href="#2-6-영역에-데이터-저장" class="headerlink" title="2.6 영역에 데이터 저장"></a>2.6 영역에 데이터 저장</h2><p>서블릿 API를 사용하지 않고</p>
+<ul>
+<li><code>@ModelAttribute</code> : REQ 영역에 attribute를 저장할 때 사용한다.</li>
+<li><code>@SessionAttribute</code> : 세션 영역에 attribute를 저장할 때 사용한다.</li>
+</ul>
+<h3 id="2-6-1-Map-활용-시"><a href="#2-6-1-Map-활용-시" class="headerlink" title="2.6.1 Map 활용 시"></a>2.6.1 Map 활용 시</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SpringSession</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@RequestMapping(&quot;/Session.do&quot;)</span></span><br><span class="line">	<span class="keyword">public</span> String <span class="title function_">login</span><span class="params">(HttpSession sesion, <span class="meta">@RequestParam</span> Map, Model model)</span> &#123;</span><br><span class="line">		<span class="keyword">if</span>(<span class="string">&quot;KIM&quot;</span>.equals(map.get(<span class="string">&quot;id&quot;</span>)) &amp;&amp; <span class="string">&quot;1234&quot;</span>.equals(map.get(<span class="string">&quot;pwd&quot;</span>))) &#123;</span><br><span class="line">			session.setAttribute(<span class="string">&quot;ID&quot;</span>, map.get(<span class="string">&quot;id&quot;</span>));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;annotation06/Annotation&quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>@SessionAttribute</code> 활용 시,</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@SessionAttributes(&#123;&quot;id&quot;, &quot;pwd&quot;&#125;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SpringSession</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/Session.do&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">login</span><span class="params">(<span class="meta">@RequestParam</span> Map map, Model model)</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="string">&quot;KIM&quot;</span>.equals(map.get(<span class="string">&quot;id&quot;</span>)) &amp;&amp; <span class="string">&quot;1234&quot;</span>.equals(map.get(<span class="string">&quot;pwd&quot;</span>)) ) &#123;</span><br><span class="line">            model.addAllAttributes(map); <span class="comment">// 세션영역에도 저장됨</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;annotation06/Annotation&quot;</span>;		   </span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>유의사항</strong></p>
+<ul>
+<li><strong>REQ파라미터명 과 @SessionAttributes() 인자명을 일치시켜야만 한다!!</strong></li>
+</ul>
+<h3 id="2-6-2-데이터커맨드-활용-시"><a href="#2-6-2-데이터커맨드-활용-시" class="headerlink" title="2.6.2 데이터커맨드 활용 시"></a>2.6.2 데이터커맨드 활용 시</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@SessionAttributes(@SessionAttributes(types=LoginCommand))</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SpringSession</span> &#123;</span><br><span class="line">	<span class="meta">@RequestMapping(&quot;/Session.do&quot;)</span></span><br><span class="line">	<span class="keyword">public</span> String <span class="title function_">login</span><span class="params">(LoginCommand cmd, Model model, SessionStatus status)</span> &#123;</span><br><span class="line">		<span class="comment">// 위의 코드를 컨테이너 내부 과정으로 표현 시</span></span><br><span class="line">        <span class="comment">// LoginCommand cmd = new LoginCommand();</span></span><br><span class="line">        <span class="comment">// cmd.setA(req.getParam(&quot;A&quot;));</span></span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        <span class="comment">// session.setAttribute(&quot;loginCommand&quot;, cmd);</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 회원이 아니면 세션에 담을 필요 없기 때문에 setComplete로 비운다.</span></span><br><span class="line">        <span class="keyword">if</span>(!(cmd.getId().equals(<span class="string">&quot;KIM&quot;</span>)) &amp;&amp; cmd.getPwd().equals(<span class="string">&quot;1234&quot;</span>)) &#123;</span><br><span class="line">			status.setComplete();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;annotation06/Annotation&quot;</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-7-RequestBody-amp-ResponseBody"><a href="#2-7-RequestBody-amp-ResponseBody" class="headerlink" title="2.7 @RequestBody &amp; @ResponseBody"></a>2.7 <code>@RequestBody</code> &amp; <code>@ResponseBody</code></h2><ul>
+<li><code>@RequestBody</code> : JSON 형식의 데이터를 읽을 때</li>
+<li><code>@ResponseBody</code> : 응답바디에 데이터를 쓸 때<ul>
+<li><code>@ResponseBody</code> + <code>@Controller</code> &#x3D; <code>@RestController</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">sendData</span>(<span class="params"></span>) &#123;</span><br><span class="line">	<span class="keyword">var</span> data = &#123;<span class="string">&quot;id&quot;</span> : <span class="string">&quot;kosmo&quot;</span>, <span class="string">&quot;pwd&quot;</span> : <span class="string">&quot;123456789&quot;</span>&#125;;</span><br><span class="line">    $.<span class="title function_">ajax</span>(&#123;</span><br><span class="line">		<span class="attr">url</span>: <span class="string">&#x27;&lt;c:url value=&quot;/Annotation/RequestBody.do&quot; /&gt;&#x27;</span>,</span><br><span class="line">        <span class="attr">method</span>: <span class="string">&quot;POST&quot;</span>,</span><br><span class="line">        <span class="attr">data</span>: <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(data),		<span class="comment">// 자바는 JSON을 모르니 문자열로 보낸다</span></span><br><span class="line">        <span class="attr">contentType</span>: <span class="string">&quot;application/json&quot;</span>,<span class="comment">// 서버로 보낼 데이터 타입 </span></span><br><span class="line">        <span class="attr">dataType</span>: <span class="string">&quot;json&quot;</span> 				<span class="comment">// 서버로부터 받을 데이터 타입</span></span><br><span class="line">    &#125;).<span class="title function_">done</span>(<span class="keyword">function</span>(<span class="params">data</span>) &#123;</span><br><span class="line">		<span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;아이디: %s, 비번: %s&#x27;</span>, data.<span class="property">id</span>, data.<span class="property">pwd</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    ).<span class="title function_">fail</span>(<span class="keyword">function</span>(<span class="params"></span>) &#123;</span><br><span class="line">		</span><br><span class="line">    &#125;</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>폼 데이터 받을 때</strong></p>
+<ul>
+<li><p>데이터커맨드</p>
+<p>혹은</p>
+</li>
+<li><p><code>@RequestParam</code></p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RequestBodyController</span> &#123;</span><br><span class="line">	<span class="meta">@RequestMapping(&quot;/Annotation/FormData.do&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseBody</span> <span class="comment">// 페이지이동이 아닌 브라우저에 데이터 전송</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">exec</span><span class="params">(LoginCommand cmd)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> String.format(<span class="string">&quot;&#123;\&quot;id\&quot; : \&quot;%s\&quot;, \&quot;pwd\&quot; : \&quot;%s\&quot;&#125;&quot;</span>, cmd.getId(), cmd.getPwd());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>JSON 데이터를 받을 때</strong></p>
+<ul>
+<li><code>@RequestBody</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RequestBodyController</span> &#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">	<span class="comment">//Jackson 라이브러리 미적용 시</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/Annotation/JSONData.do&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseBody</span> <span class="comment">// 페이지이동이 아닌 브라우저에 데이터 전송</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">exec</span><span class="params">(<span class="meta">@RequestBody</span> String json)</span> &#123;</span><br><span class="line">        <span class="comment">//String id = json 파싱...</span></span><br><span class="line">        <span class="comment">//String pwd = json 파싱...</span></span><br><span class="line">        <span class="comment">//String newJSON;</span></span><br><span class="line">		<span class="keyword">return</span> newJSON;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">	<span class="comment">//Jackson 라이브러리 적용 시</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/Annotation/JSONData.do&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseBody</span> <span class="comment">// 페이지이동이 아닌 브라우저에 데이터 전송</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">exec</span><span class="params">(<span class="meta">@RequestBody</span> LoginCommand cmd)</span> &#123;</span><br><span class="line">		<span class="type">String</span> <span class="variable">id</span> <span class="operator">=</span> cmd.id;</span><br><span class="line">        <span class="type">String</span> <span class="variable">pwd</span> <span class="operator">=</span> cmd.pwd;</span><br><span class="line">        <span class="keyword">return</span> cmd;</span><br><span class="line">    &#125;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-8-RequestHeader"><a href="#2-8-RequestHeader" class="headerlink" title="2.8 @RequestHeader"></a>2.8 <code>@RequestHeader</code></h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RequestHeaderController</span> &#123;</span><br><span class="line">	<span class="meta">@RequestMapping(&quot;RequestHeader.do&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">exec</span><span class="params">(Model model, </span></span><br><span class="line"><span class="params">                       <span class="meta">@RequestHeader(value=&quot;req헤더명&quot; required=false default=&quot;[NULL]&quot;)</span> String reqHeader)</span> &#123;</span><br><span class="line">		   <span class="keyword">return</span> <span class="string">&quot;뷰페이지명&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/06/13/01-Controller/" rel="prev" title="01_Controller">
+      <i class="fa fa-chevron-left"></i> 01_Controller
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/06/13/01-JSIntro/" rel="next" title="01_JSIntro">
+      01_JSIntro <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Inversion-Of-Controll"><span class="nav-text">1. Inversion Of Controll</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-Autowired%EB%A1%9C-Bean-Wiring-%EA%B6%8C%EC%9E%A5"><span class="nav-text">1.1 @Autowired로 Bean Wiring (권장)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EC%98%B5%EC%85%981-Autowired-Qualifier-%EC%84%A0%ED%83%9D%EC%82%AC%ED%95%AD"><span class="nav-text">옵션1 @Autowired; @Qualifier(선택사항)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EC%98%B5%EC%85%982-Resource"><span class="nav-text">옵션2 (@Resource)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-%EC%84%B8%ED%84%B0%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EC%A3%BC%EC%9E%85-%EB%B9%84%EC%B6%94%EC%B2%9C"><span class="nav-text">1.2 세터를 활용한 주입 (비추천)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Annotation"><span class="nav-text">2. Annotation @</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-RequestMapping"><span class="nav-text">2.1 @RequestMapping</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-%EC%97%AC%EB%9F%AC%EC%9A%94%EC%B2%AD%EC%9D%84-%ED%95%98%EB%82%98%EC%9D%98-%EC%BB%A8%ED%8A%B8%EB%A1%A4%EB%9F%AC-%EB%A9%94%EC%86%8C%EB%93%9C%EB%A1%9C-%EC%B2%98%EB%A6%AC"><span class="nav-text">2.1.1 여러요청을 하나의 컨트롤러 메소드로 처리</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-RequestParam"><span class="nav-text">2.2 @RequestParam </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-1-RequestParam-Map-map"><span class="nav-text">2.2.1 @RequestParam Map map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2-%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%BB%A4%EB%A7%A8%EB%93%9C-%ED%99%9C%EC%9A%A9"><span class="nav-text">2.2.2 데이터커맨드 활용</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-Resource"><span class="nav-text">2.3 @Resource</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-Lazy"><span class="nav-text">2.4 @Lazy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5-%EC%8A%A4%ED%94%84%EB%A7%81%EC%97%90-%EB%B9%88-%EB%93%B1%EB%A1%9D"><span class="nav-text">2.5 스프링에 빈 등록</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-6-%EC%98%81%EC%97%AD%EC%97%90-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%A0%80%EC%9E%A5"><span class="nav-text">2.6 영역에 데이터 저장</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-1-Map-%ED%99%9C%EC%9A%A9-%EC%8B%9C"><span class="nav-text">2.6.1 Map 활용 시</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-2-%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%BB%A4%EB%A7%A8%EB%93%9C-%ED%99%9C%EC%9A%A9-%EC%8B%9C"><span class="nav-text">2.6.2 데이터커맨드 활용 시</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-7-RequestBody-amp-ResponseBody"><span class="nav-text">2.7 @RequestBody &amp; @ResponseBody</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-8-RequestHeader"><span class="nav-text">2.8 @RequestHeader</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
